@@ -4,7 +4,7 @@ _SC_DIR="$(cd "`dirname "$0"`"; pwd)"
 
 _PREFIX=/usr/local
 _SCRATCH_DIR="$_SC_DIR/.."
-_EXTRA_ARGS=--without-ruby
+_EXTRA_ARGS=
 
 # Parse command line arguments
 while [[ $# -gt 0 ]]; do
@@ -16,27 +16,21 @@ while [[ $# -gt 0 ]]; do
     _SCRATCH_DIR="${1#*=}"
     ;;
   --without-python)
-    _EXTRA_ARGS="$_EXTRA_ARGS --without-python"
-    ;;
-  --with-openssl)
-    _SSL_LIB=1
-    ;;
-  --without-pcre)
-    _PCRE_LIB=0
-    _EXTRA_ARGS="$_EXTRA_ARGS --without-pcre"
+    _EXTRA_ARGS="$_EXTRA_ARGS -DWITHOUT_PYTHON=ON"
     ;;
   --state-dir=*)
-    _EXTRA_ARGS="$_EXTRA_ARGS --enable-statedir=${1#*=}"
+    _EXTRA_ARGS="$_EXTRA_ARGS -DWATCHMAN_STATE_DIR=${1#*=}"
     ;;
   --config-file=*)
-    _EXTRA_ARGS="$_EXTRA_ARGS --enable-conffile=${1#*=}"
+    _EXTRA_ARGS="$_EXTRA_ARGS -DWATCHMAN_CONFIG_FILE=${1#*=}"
     ;;
-  --unit-test)
-    _NO_TESTS=0
+  --no-tests)
+    _NO_TESTS=1
+    _EXTRA_ARGS="$_EXTRA_ARGS -DBUILD_TESTING=OFF"
     ;;
   *)
-    echo "Usage: $0 [--prefix=$_PREFIX] [--without-python] [--with-openssl]"
-    echo "            [--without-pcre] [--state-dir=$_PREFIX/var/run/watchman]"
+    echo "Usage: $0 [--prefix=$_PREFIX] [--without-python] [--no-tests]"
+    echo "            [--state-dir=$_PREFIX/var/run/watchman] [--with-lzma]"
     exit
     ;;
   esac
@@ -44,13 +38,18 @@ while [[ $# -gt 0 ]]; do
 done
 
 # Install dependencies
-[[ "$_SSL_LIB" != 1 ]] || "$_SC_DIR/_build_openssl.sh" "$_PREFIX" "$_SCRATCH_DIR"
-[[ "$_PCRE_LIB" == 0 ]] || "$_SC_DIR/_build_pcre.sh" "$_PREFIX" "$_SCRATCH_DIR"
+"$_SC_DIR/_build_pcre.sh" "$_PREFIX" "$_SCRATCH_DIR"
+"$_SC_DIR/_build_openssl.sh" "$_PREFIX" "$_SCRATCH_DIR"
+# TODO: LibEvent
 
-# Prepare build arguments
-[[ "$_PCRE_LIB" == 0 || ! -x "$_PREFIX/bin/pcre-config" ]] || \
-  _EXTRA_ARGS="$_EXTRA_ARGS --with-pcre=$_PREFIX/bin/pcre-config"
-[[ "$_SSL_LIB" != 1 && "$_PCRE_LIB" == 0 ]] || \
-  _EXTRA_ARGS="$_EXTRA_ARGS CPPFLAGS=-I$_PREFIX/include LIBS=-L$_PREFIX/lib"
+# Gflags
+# Glog
+# fmt
 
-"$_SC_DIR/_build_watchman.sh" "$_PREFIX" "$_SCRATCH_DIR" "$_EXTRA_ARGS" "$_NO_TESTS"
+# Boost (context thread)
+# folly
+
+# [[ "$_NO_TESTS" == 1 ]] || GMock / GTest / GoogleTest
+
+
+# "$_SC_DIR/_build_watchman.sh" "$_PREFIX" "$_SCRATCH_DIR" "$_EXTRA_ARGS" "$_NO_TESTS"

@@ -1,0 +1,23 @@
+diff --git a/CMake/folly-deps.cmake b/CMake/folly-deps.cmake
+index a0479e6db..f404f83eb 100644
+--- a/CMake/folly-deps.cmake
++++ b/CMake/folly-deps.cmake
+@@ -70,6 +70,9 @@ find_package(LibEvent MODULE REQUIRED)
+ list(APPEND FOLLY_LINK_LIBRARIES ${LIBEVENT_LIB})
+ list(APPEND FOLLY_INCLUDE_DIRECTORIES ${LIBEVENT_INCLUDE_DIR})
+ 
++set(FOLLY_ORIGINAL_CMAKE_REQUIRED_FLAGS "${CMAKE_REQUIRED_FLAGS}")
++string(REGEX REPLACE " -std=[^ ]*" "" CMAKE_REQUIRED_FLAGS "${CMAKE_REQUIRED_FLAGS}")
++
+ find_package(ZLIB MODULE)
+ set(FOLLY_HAVE_LIBZ ${ZLIB_FOUND})
+ if (ZLIB_FOUND)
+@@ -104,6 +107,8 @@ if (LIBLZMA_FOUND)
+   list(APPEND FOLLY_LINK_LIBRARIES ${LIBLZMA_LIBRARIES})
+ endif()
+ 
++set(CMAKE_REQUIRED_FLAGS "${FOLLY_ORIGINAL_CMAKE_REQUIRED_FLAGS}")
++
+ find_package(LZ4 MODULE)
+ set(FOLLY_HAVE_LIBLZ4 ${LZ4_FOUND})
+ if (LZ4_FOUND)

@@ -17,13 +17,13 @@ export CXX=clang++
 
 ```bash
 # Use the stable release
-git clone --depth=1 -b v4_9_0 https://github.com/thachnn/watchman-builder.git
+git clone --depth=1 -b v2021_02_15 https://github.com/thachnn/watchman-builder.git
 cd watchman-builder
 
 ./build.sh --prefix=/opt/local --scratch-path=/usr/local/src \
-  --without-python --with-openssl --state-dir=/usr/local/var/run/watchman
+  --without-python --state-dir=/usr/local/var/run/watchman --no-tests
 
 # Pack the built
-cd /opt/local && zip -r ~/watchman-4.9.0-macos.zip bin/watchman* share/doc/watchman*
-cd /usr/local && zip -ru ~/watchman-4.9.0-macos.zip var/run/watchman*
+cd /opt/local && zip -r ~/watchman-2021.02.15-macos.zip bin/watchman*
+cd /usr/local && zip -ru ~/watchman-2021.02.15-macos.zip var/run/watchman*
 ```

@@ -1,7 +1,7 @@
 #!/bin/bash
 set -xe
 
-_PKG=pcre-8.41
+_PKG=pcre-8.44
 _PREFIX="$1"
 _SCRATCH_DIR="$2"
 
