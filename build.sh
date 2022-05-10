@@ -31,6 +31,9 @@ while [[ $# -gt 0 ]]; do
   --config-file=*)
     _EXTRA_ARGS="$_EXTRA_ARGS --enable-conffile=${1#*=}"
     ;;
+  --unit-test)
+    _NO_TESTS=0
+    ;;
   *)
     echo "Usage: $0 [--prefix=$_PREFIX] [--without-python] [--with-openssl]"
     echo "            [--without-pcre] [--state-dir=$_PREFIX/var/run/watchman]"
@@ -45,9 +48,9 @@ done
 [[ "$_PCRE_LIB" == 0 ]] || "$_SC_DIR/_build_pcre.sh" "$_PREFIX" "$_SCRATCH_DIR"
 
 # Prepare build arguments
-[[ ! -x "$_PREFIX/bin/pcre-config" -o "$_PCRE_LIB" == 0 ]] || \
+[[ "$_PCRE_LIB" == 0 || ! -x "$_PREFIX/bin/pcre-config" ]] || \
   _EXTRA_ARGS="$_EXTRA_ARGS --with-pcre=$_PREFIX/bin/pcre-config"
-[[ "$_SSL_LIB" != 1 -a "$_PCRE_LIB" == 0 ]] || \
-  _EXTRA_ARGS="$_EXTRA_ARGS CPPFLAGS=-I$_PREFIX/include LDFLAGS=-L$_PREFIX/lib"
+[[ "$_SSL_LIB" != 1 && "$_PCRE_LIB" == 0 ]] || \
+  _EXTRA_ARGS="$_EXTRA_ARGS CPPFLAGS=-I$_PREFIX/include LIBS=-L$_PREFIX/lib"
 
-"$_SC_DIR/_build_watchman.sh" "$_PREFIX" "$_SCRATCH_DIR" "$_EXTRA_ARGS"
+"$_SC_DIR/_build_watchman.sh" "$_PREFIX" "$_SCRATCH_DIR" "$_EXTRA_ARGS" "$_NO_TESTS"

@@ -16,7 +16,7 @@ then
   perl Configure darwin64-x86_64-cc no-shared "--prefix=$_PREFIX"
 
   # Build lib only
-  sed -i- 's/^\(DIRS=.*\) apps test tools$/\1/' Makefile
+  sed -i- 's/^\(DIRS *=.*\) apps test tools$/\1/' Makefile
   make -j2
   make install_sw
 fi

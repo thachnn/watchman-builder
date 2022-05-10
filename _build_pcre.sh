@@ -14,11 +14,11 @@ then
 
   cd "$_PKG"
   ./configure --disable-dependency-tracking --enable-unicode-properties --enable-utf8 \
-    --enable-jit --disable-shared "--prefix=$_PREFIX"
+    --enable-jit --disable-shared "--prefix=$_PREFIX" CFLAGS=-O2
 
   # Build lib only
   sed -i- -e 's/^\(PROGRAMS *=\).*/\1/;s/^\(MANS *=\).*/\1/' Makefile
-  make -j2
+  make -j2 V=1
   make install-binSCRIPTS install-libLTLIBRARIES \
     install-includeHEADERS install-nodist_includeHEADERS install-pkgconfigDATA
 fi
