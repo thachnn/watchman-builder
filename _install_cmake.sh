@@ -8,6 +8,7 @@ if ! command -v cmake &> /dev/null
 then
   if [[ ! -x "$_PREFIX/bin/cmake" ]]
   then
+  (
     _PKG=cmake-3.18.6-Darwin-x86_64
 
     cd "$_SCRATCH_DIR"
@@ -20,8 +21,7 @@ then
     cp -af "$_PKG/CMake.app/Contents/bin" "$_PREFIX/"
     cp -af "$_PKG/CMake.app/Contents/share" "$_PREFIX/"
     rm -rf "$_PKG"
-
-    unset _PKG
+  )
   fi
 
   export PATH="$_PREFIX/bin:$PATH"
