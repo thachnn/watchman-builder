@@ -14,14 +14,15 @@ then
   tar -xf "$_PKG.tgz"
 
   cd "$_PKG"
-  CMAKE_PREFIX_PATH="$_PREFIX" \
   cmake . -DCMAKE_BUILD_TYPE=Release -DCMAKE_FIND_FRAMEWORK=LAST \
-    -DCMAKE_VERBOSE_MAKEFILE=ON -Wno-dev -DBUILD_TESTING=OFF \
-    "-DCMAKE_INSTALL_PREFIX=$_PREFIX" -DBUILD_SHARED_LIBS=OFF
+    -DCMAKE_VERBOSE_MAKEFILE=ON -Wno-dev -DCMAKE_EXPORT_NO_PACKAGE_REGISTRY=ON \
+    -DBUILD_TESTING=OFF "-DCMAKE_INSTALL_PREFIX=$_PREFIX" "-DCMAKE_PREFIX_PATH=$_PREFIX"
 
+  # Use relative paths
+  find CMakeFiles -name build.make -exec sed -i- "s:-c $PWD/:-c :" {} +
   make -j2 install
 
-  # Install missing files
+  # Missing files
   mkdir -p "$_PREFIX/lib/pkgconfig"
   sed -e "s:@prefix@:$_PREFIX:" -e 's,@includedir@,${prefix}/include,' \
     -e 's/@exec_prefix@/${prefix}/' -e 's,@libdir@,${exec_prefix}/lib,' \

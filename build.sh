@@ -4,7 +4,7 @@ _SC_DIR="$(dirname "$0")"
 
 _PREFIX=/usr/local
 _SCRATCH_DIR="$(cd "$_SC_DIR/.."; pwd)"
-_EXTRA_ARGS=
+_EXTRA_ARGS=-DENABLE_EDEN_SUPPORT=OFF
 
 # Parse command line arguments
 while [[ $# -gt 0 ]]; do
@@ -46,7 +46,7 @@ done
 "$_SC_DIR/_build_libevent.sh" "$_PREFIX" "$_SCRATCH_DIR"
 #
 "$_SC_DIR/_build_gflags.sh" "$_PREFIX" "$_SCRATCH_DIR"
-# Glog
+"$_SC_DIR/_build_glog.sh" "$_PREFIX" "$_SCRATCH_DIR"
 # fmt
 
 # Boost (context thread)

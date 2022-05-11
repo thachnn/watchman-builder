@@ -18,5 +18,7 @@ then
     -DCMAKE_VERBOSE_MAKEFILE=ON -Wno-dev -DBUILD_TESTING=OFF \
     "-DCMAKE_INSTALL_PREFIX=$_PREFIX" -DREGISTER_INSTALL_PREFIX=OFF
 
+  # Use relative paths
+  find CMakeFiles -name build.make -exec sed -i- "s:-c $PWD/:-c :" {} +
   make -j2 install
 fi
