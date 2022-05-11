@@ -10,7 +10,7 @@ _NO_TESTS="$4"
 
 cd "$_SCRATCH_DIR"
 [[ -s "$_PKG.tgz" ]] || \
-curl -o "$_PKG.tgz" -kSL "https://github.com/facebook/watchman/archive/v${_PKG#*-}.tar.gz"
+  curl -o "$_PKG.tgz" -kSL "https://github.com/facebook/watchman/archive/v${_PKG#*-}.tar.gz"
 rm -rf "$_PKG"
 tar -xf "$_PKG.tgz"
 
@@ -20,7 +20,7 @@ patch -p1 -i "$_SC_DIR/watchman.patch"
 CMAKE_PREFIX_PATH="$_PREFIX" \
 cmake . -DCMAKE_BUILD_TYPE=Release -DCMAKE_FIND_FRAMEWORK=LAST \
   -DCMAKE_VERBOSE_MAKEFILE=ON -Wno-dev \
-  -DWATCHMAN_VERSION_OVERRIDE=2021.02.15 -DWATCHMAN_BUILDINFO_OVERRIDE=@builder \
+  -DWATCHMAN_VERSION_OVERRIDE=2021.02.15 -DWATCHMAN_BUILDINFO_OVERRIDE=github.com/thachnn \
   "-DCMAKE_INSTALL_PREFIX=$_PREFIX" $_EXTRA_ARGS
 
 make -j2

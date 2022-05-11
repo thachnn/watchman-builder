@@ -15,7 +15,7 @@ then
   cd "$_PKG"
   perl Configure darwin64-x86_64-cc no-shared "--prefix=$_PREFIX" \
     enable-ec_nistp_64_gcc_128 no-tests
-  # TODO: enable-ec_nistp_64_gcc_128 may not needle
+  # TODO: enable-ec_nistp_64_gcc_128 may not be needed
 
   # Build lib only
   sed -i- 's,^LIBS=apps/libapps\.a ,LIBS=,' Makefile

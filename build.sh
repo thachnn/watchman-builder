@@ -40,8 +40,9 @@ done
 # Install dependencies
 "$_SC_DIR/_build_pcre.sh" "$_PREFIX" "$_SCRATCH_DIR"
 "$_SC_DIR/_build_openssl.sh" "$_PREFIX" "$_SCRATCH_DIR"
-# TODO: LibEvent
+"$_SC_DIR/_build_libevent.sh" "$_PREFIX" "$_SCRATCH_DIR"
 
+# TODO: cmake
 # Gflags
 # Glog
 # fmt
