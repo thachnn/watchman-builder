@@ -1,9 +1,9 @@
 #!/bin/bash
 set -xe
-_SC_DIR="$(cd "`dirname "$0"`"; pwd)"
+_SC_DIR="$(dirname "$0")"
 
 _PREFIX=/usr/local
-_SCRATCH_DIR="$_SC_DIR/.."
+_SCRATCH_DIR="$(cd "$_SC_DIR/.."; pwd)"
 _EXTRA_ARGS=--without-ruby
 
 # Parse command line arguments
