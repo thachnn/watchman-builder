@@ -5,7 +5,7 @@ _PKG=libevent-2.1.12-stable
 _PREFIX="$1"
 _SCRATCH_DIR="$2"
 
-if [[ ! -x "$_PREFIX/lib/libevent.a" ]]
+if [[ ! -e "$_PREFIX/lib/libevent.a" ]]
 then
   cd "$_SCRATCH_DIR"
   [[ -s "$_PKG.tar.gz" ]] || \

@@ -1,9 +1,9 @@
 #!/bin/bash
 set -xe
-_SC_DIR="$(cd "`dirname "$0"`"; pwd)"
+_SC_DIR="$(dirname "$0")"
 
 _PREFIX=/usr/local
-_SCRATCH_DIR="$_SC_DIR/.."
+_SCRATCH_DIR="$(cd "$_SC_DIR/.."; pwd)"
 _EXTRA_ARGS=
 
 # Parse command line arguments
@@ -37,13 +37,15 @@ while [[ $# -gt 0 ]]; do
   shift
 done
 
-# Install dependencies
+# Install build tools
+. "$_SC_DIR/_install_cmake.sh"
+
+# Watchman dependencies
 "$_SC_DIR/_build_pcre.sh" "$_PREFIX" "$_SCRATCH_DIR"
 "$_SC_DIR/_build_openssl.sh" "$_PREFIX" "$_SCRATCH_DIR"
 "$_SC_DIR/_build_libevent.sh" "$_PREFIX" "$_SCRATCH_DIR"
-
-# TODO: cmake
-# Gflags
+#
+"$_SC_DIR/_build_gflags.sh" "$_PREFIX" "$_SCRATCH_DIR"
 # Glog
 # fmt
 
