@@ -5,6 +5,7 @@ _PKG=glog-0.4.0
 _PREFIX="$1"
 _SCRATCH_DIR="$2"
 
+# Depends on: gflags
 if [[ ! -e "$_PREFIX/lib/cmake/glog" ]]
 then
   cd "$_SCRATCH_DIR"

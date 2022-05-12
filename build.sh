@@ -43,14 +43,18 @@ done
 # Watchman dependencies
 "$_SC_DIR/_build_pcre.sh" "$_PREFIX" "$_SCRATCH_DIR"
 "$_SC_DIR/_build_openssl.sh" "$_PREFIX" "$_SCRATCH_DIR"
-"$_SC_DIR/_build_libevent.sh" "$_PREFIX" "$_SCRATCH_DIR"
-#
 "$_SC_DIR/_build_gflags.sh" "$_PREFIX" "$_SCRATCH_DIR"
 "$_SC_DIR/_build_glog.sh" "$_PREFIX" "$_SCRATCH_DIR"
+"$_SC_DIR/_build_libevent.sh" "$_PREFIX" "$_SCRATCH_DIR"
 "$_SC_DIR/_build_fmt.sh" "$_PREFIX" "$_SCRATCH_DIR"
 
-# Boost (context thread)
-# folly
+# Boost
+"$_SC_DIR/__build_icu4c.sh" "$_PREFIX" "$_SCRATCH_DIR"
+"$_SC_DIR/_build_boost.sh" "$_PREFIX" "$_SCRATCH_DIR" \
+  'regex,thread,filesystem,system,context,program_options'
+
+# Folly
+
 
 # [[ "$_NO_TESTS" == 1 ]] || GMock / GTest / GoogleTest
 
