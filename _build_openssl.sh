@@ -5,7 +5,7 @@ _PKG=openssl-1.1.1i
 _PREFIX="$1"
 _SCRATCH_DIR="$2"
 
-if [[ ! -e "$_PREFIX/lib/libcrypto.a" ]]
+if [[ ! -e "$_PREFIX/include/openssl" ]]
 then
   cd "$_SCRATCH_DIR"
   [[ -s "$_PKG.tar.gz" ]] || curl -OkSL "https://ftp.openssl.org/source/$_PKG.tar.gz"

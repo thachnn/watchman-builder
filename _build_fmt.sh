@@ -1,7 +1,7 @@
 #!/bin/bash
 set -xe
 
-_PKG=fmt-7.1.3
+_PKG=fmt-6.1.2
 _PREFIX="$1"
 _SCRATCH_DIR="$2"
 
