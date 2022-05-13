@@ -24,13 +24,16 @@ while [[ $# -gt 0 ]]; do
   --config-file=*)
     _EXTRA_ARGS="$_EXTRA_ARGS -DWATCHMAN_CONFIG_FILE=${1#*=}"
     ;;
-  --no-tests)
-    _NO_TESTS=1
+  --unit-test)
+    _NO_TESTS=0
     _EXTRA_ARGS="$_EXTRA_ARGS -DBUILD_TESTING=OFF"
     ;;
+  --with-os-libs)
+    _WITH_OS_LIBS=1
+    ;;
   *)
-    echo "Usage: $0 [--prefix=$_PREFIX] [--without-python] [--no-tests]"
-    echo "            [--state-dir=$_PREFIX/var/run/watchman] [--with-lzma]"
+    echo "Usage: $0 [--prefix=$_PREFIX] [--without-python] [--with-os-libs]"
+    echo "            [--state-dir=$_PREFIX/var/run/watchman] [--unit-test]"
     exit
     ;;
   esac
@@ -53,13 +56,19 @@ done
 "$_SC_DIR/_build_boost.sh" "$_PREFIX" "$_SCRATCH_DIR" \
   'regex,thread,filesystem,system,context,program_options'
 
+# GoogleTest
+[[ "$_NO_TESTS" != 0 ]] || "$_SC_DIR/_build_googletest.sh" "$_PREFIX" "$_SCRATCH_DIR"
+
 # Folly
-"$_SC_DIR/__build_lzma.sh" "$_PREFIX" "$_SCRATCH_DIR"
+"$_SC_DIR/__build_double-conversion.sh" "$_PREFIX" "$_SCRATCH_DIR"
+[[ "$_WITH_OS_LIBS" != 1 ]] || "$_SC_DIR/__build_lzma.sh" "$_PREFIX" "$_SCRATCH_DIR"
 "$_SC_DIR/__build_lz4.sh" "$_PREFIX" "$_SCRATCH_DIR"
 "$_SC_DIR/__build_zstd.sh" "$_PREFIX" "$_SCRATCH_DIR"
+"$_SC_DIR/__build_snappy.sh" "$_PREFIX" "$_SCRATCH_DIR"
+# NOTE: LibDwarf LibIberty LibAIO LibUring ?
+"$_SC_DIR/__build_libsodium.sh" "$_PREFIX" "$_SCRATCH_DIR"
+[[ "$_WITH_OS_LIBS" != 1 ]] || "$_SC_DIR/__build_libunwind.sh" "$_PREFIX" "$_SCRATCH_DIR"
+"$_SC_DIR/_build_folly.sh" "$_PREFIX" "$_SCRATCH_DIR" "$_NO_TESTS"
 
 
-# [[ "$_NO_TESTS" == 1 ]] || GMock / GTest / GoogleTest
-
-
-# "$_SC_DIR/_build_watchman.sh" "$_PREFIX" "$_SCRATCH_DIR" "$_EXTRA_ARGS" "$_NO_TESTS"
+"$_SC_DIR/_build_watchman.sh" "$_PREFIX" "$_SCRATCH_DIR" "$_EXTRA_ARGS" "$_NO_TESTS"

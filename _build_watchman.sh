@@ -23,5 +23,5 @@ cmake . -DCMAKE_BUILD_TYPE=Release -DCMAKE_FIND_FRAMEWORK=LAST \
   "-DWATCHMAN_VERSION_OVERRIDE=${_PKG#*-}" "-DWATCHMAN_BUILDINFO_OVERRIDE=$USER"
 
 make -j2
-[[ "$_NO_TESTS" == 1 ]] || make check
+[[ "$_NO_TESTS" != 0 ]] || make check
 make install

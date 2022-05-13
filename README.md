@@ -21,7 +21,7 @@ git clone --depth=1 -b v2021_02_15 https://github.com/thachnn/watchman-builder.g
 cd watchman-builder
 
 ./build.sh --prefix=/opt/local --scratch-path=/usr/local/src \
-  --without-python --state-dir=/usr/local/var/run/watchman --no-tests
+  --without-python --state-dir=/usr/local/var/run/watchman --unit-test
 
 # Pack the built
 cd /opt/local && zip -r ~/watchman-2021.02.15-macos.zip bin/watchman*
