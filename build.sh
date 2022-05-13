@@ -54,6 +54,7 @@ done
   'regex,thread,filesystem,system,context,program_options'
 
 # Folly
+"$_SC_DIR/__build_lzma.sh" "$_PREFIX" "$_SCRATCH_DIR"
 
 
 # [[ "$_NO_TESTS" == 1 ]] || GMock / GTest / GoogleTest

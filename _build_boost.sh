@@ -18,13 +18,14 @@ then
   tar -xf "$_PKG.tar.bz2"
 
   cd "$_PKG"
-  echo "using darwin : : ${CXX} ;" > user-config.jam
+  # Disable debugging symbols
+  echo "using darwin : : ${CXX} : <compileflags>-g0 ;" > user-config.jam
   ./bootstrap.sh "--prefix=$_PREFIX" "--with-icu=$_PREFIX" "--with-libraries=$_LIBRARIES"
 
   # Fix slow headers copying
-  rsync -a --exclude='*.'{cpp,pl,erb,re,txt,patch,m4,bat,sh,dtd} boost "$_PREFIX/include/"
+  rsync -aW --exclude='*.'{cpp,pl,erb,re,txt,patch,m4,bat,sh,dtd} boost "$_PREFIX/include"
 
-  ./b2 -d2 -j2 --user-config=user-config.jam variant=release cxxflags='-std=c++14' \
-    threading=multi link=static include="$_PREFIX/include" library-path="$_PREFIX/lib" \
-    install cxxflags='-stdlib=libc++' linkflags='-stdlib=libc++'
+  # Clang compiler may need `cxxflags=-stdlib=libc++ linkflags=-stdlib=libc++`
+  ./b2 -d2 -j2 --user-config=user-config.jam variant=release cxxflags=-std=c++14 install \
+    threading=multi link=static "include=$_PREFIX/include" "library-path=$_PREFIX/lib"
 fi
