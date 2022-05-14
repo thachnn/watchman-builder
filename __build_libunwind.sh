@@ -23,8 +23,11 @@ then
   [[ -z "$MACOSX_DEPLOYMENT_TARGET" ]] || \
     _args="$_args MACOSX_DEPLOYMENT_TARGET=$MACOSX_DEPLOYMENT_TARGET"
 
-  xcodebuild -jobs 2 -configuration Release -target dyld-libunwind.a \
-    -project libunwind.xcodeproj DEBUG_INFORMATION_FORMAT= $_args
+  xcodebuild -dry-run -configuration Release -target dyld-libunwind.a \
+    -project libunwind.xcodeproj $_args DEBUG_INFORMATION_FORMAT= > xcodebuild.sh
+
+  sed -i '' -e 's/^ *//' -e '/^[^\/]/d;/^$/d' -e "s: $PWD/: :g;s:$PWD/:./:g" xcodebuild.sh
+  . xcodebuild.sh
 
   # Install files
   cp -pf build/Release/libunwind.a "$_PREFIX/lib/"
