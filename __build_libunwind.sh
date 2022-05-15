@@ -1,35 +1,37 @@
 #!/bin/bash
 set -xe
+_SC_DIR="$(cd "`dirname "$0"`"; pwd)"
 
 _PKG=libunwind-35.3
-_DEP_PKG=dyld-239.4
+_BASE_URL=https://github.com/apple-oss-distributions
 _PREFIX="$1"
 _SCRATCH_DIR="$2"
 
 if [[ ! -e "$_PREFIX/lib/libunwind.a" ]]
 then
   cd "$_SCRATCH_DIR"
-
-  for pkg in "$_PKG" "$_DEP_PKG" ; do
-    [[ -s "$pkg.tar.gz" ]] || \
-      curl -OkSL "https://github.com/apple-oss-distributions/${pkg%-*}/archive/$pkg.tar.gz"
-    rm -rf "$pkg"
-    tar -xf "$pkg.tar.gz" && mv "${pkg%-*}-$pkg" "$pkg"
-  done
+  [[ -s "$_PKG.tar.gz" ]] || curl -OkSL "$_BASE_URL/libunwind/archive/$_PKG.tar.gz"
+  rm -rf "$_PKG"
+  tar -xf "$_PKG.tar.gz" && mv "libunwind-$_PKG" "$_PKG"
 
   cd "$_PKG"
-  cp -pf "../$_DEP_PKG/include/mach-o/dyld_priv.h" include/mach-o/
+  # Patch to create Makefile
+  patch -p1 -i "$_SC_DIR/libunwind.patch"
 
-  [[ -z "$MACOSX_DEPLOYMENT_TARGET" ]] || \
-    _args="$_args MACOSX_DEPLOYMENT_TARGET=$MACOSX_DEPLOYMENT_TARGET"
+  # Missing headers
+  _DEPS=(dyld-239.4 libpthread-105.1.4 xnu-2422.115.4)
+  curl -o include/mach-o/dyld_priv.h -kfSL \
+    "$_BASE_URL/dyld/raw/${_DEPS[0]}/include/mach-o/dyld_priv.h"
 
-  xcodebuild -dry-run -configuration Release -target dyld-libunwind.a \
-    -project libunwind.xcodeproj $_args DEBUG_INFORMATION_FORMAT= > xcodebuild.sh
+  # Missing headers for shared library
+  #mkdir -p include/{pthread,os,System/machine}
+  #curl -o include/System/pthread_machdep.h -kfSL \
+  #  "$_BASE_URL/libpthread/raw/${_DEPS[1]}/private/tsd_private.h"
+  #curl -o include/pthread/spinlock_private.h -kfSL \
+  #  "$_BASE_URL/libpthread/raw/${_DEPS[1]}/private/spinlock_private.h"
+  #curl -o include/System/machine/cpu_capabilities.h -kfSL \
+  #  "$_BASE_URL/xnu/raw/${_DEPS[2]}/osfmk/i386/cpu_capabilities.h"
+  #curl -o include/os/tsd.h -kfSL "$_BASE_URL/xnu/raw/${_DEPS[2]}/libsyscall/os/tsd.h"
 
-  sed -i '' -e 's/^ *//' -e '/^[^\/]/d;/^$/d' -e "s: $PWD/: :g;s:$PWD/:./:g" xcodebuild.sh
-  . xcodebuild.sh
-
-  # Install files
-  cp -pf build/Release/libunwind.a "$_PREFIX/lib/"
-  rm -f include/mach-o/dyld_priv.h && cp -af include "$_PREFIX/"
+  make -j2 V=1 install-static install-includes "PREFIX=$_PREFIX" RELEASE=1
 fi

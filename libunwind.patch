@@ -1,0 +1,232 @@
+diff --git a/Makefile b/Makefile
+new file mode 100644
+index 0000000..8fc59a8
+--- /dev/null
++++ b/Makefile
+@@ -0,0 +1,226 @@
++###################################################
++#
++# Makefile for macOS libunwind
++# Created: [10:13 AM Sunday, May 15, 2022]
++#
++###################################################
++
++Q := $(if $(filter 1,$(V) $(VERBOSE)),,@)
++
++# Version numbers
++VERSION  ?= 35.3
++VER_MAJOR = $(firstword $(subst ., ,$(VERSION)))
++
++#
++# Macros
++#
++
++CXX     ?= clang -x c++
++CC      ?= clang -x c
++ASM     ?= clang -x assembler-with-cpp
++LIBTOOL ?= libtool
++ARCH    ?= $(shell uname -m)
++
++#
++# Build configurations
++#
++
++CPPFLAGS := -Wunused-variable -Wmissing-prototypes $(CPPFLAGS) -I./include
++CXXFLAGS := -fno-exceptions -fno-rtti $(CXXFLAGS) -stdlib=libc++
++CFLAGS   := -Werror=implicit-function-declaration $(CFLAGS)
++
++ifeq ($(RELEASE), 1)
++CPPFLAGS := -O3 -Wno-newline-eof $(CPPFLAGS) -DNDEBUG
++CXXFLAGS := -Wno-overloaded-virtual $(CXXFLAGS)
++CFLAGS   += -std=gnu99
++else
++CPPFLAGS := -O0 -Wnewline-eof -Wsign-compare -g -Wall $(CPPFLAGS)
++CXXFLAGS := -Woverloaded-virtual $(CXXFLAGS)
++CFLAGS   += -std=c99
++endif
++
++OTHER_CFLAGS   ?= -fexceptions
++OTHER_CXXFLAGS ?= -funwind-tables
++
++CPPFLAGS := -arch $(ARCH) \
++			-fmessage-length=0 \
++			-fdiagnostics-show-note-include-stack \
++			-fmacro-backtrace-limit=0 \
++			-Wno-trigraphs \
++			-fpascal-strings \
++			-Wno-missing-field-initializers \
++			-Wno-missing-braces \
++			-Wparentheses \
++			-Wswitch \
++			-Wno-unused-function \
++			-Wno-unused-label \
++			-Wno-unused-parameter \
++			-Wunused-value \
++			-Wno-empty-body \
++			-Wno-uninitialized \
++			-Wno-unknown-pragmas \
++			-Wno-shadow \
++			-Wno-four-char-constants \
++			-Wno-conversion \
++			-Wno-constant-conversion \
++			-Wno-int-conversion \
++			-Wno-bool-conversion \
++			-Wno-enum-conversion \
++			-Wno-float-conversion \
++			-Wno-non-literal-null-conversion \
++			-Wno-objc-literal-conversion \
++			-Wno-shorten-64-to-32 \
++			-fasm-blocks \
++			-fstrict-aliasing \
++			-Wdeprecated-declarations \
++			-fvisibility=hidden \
++			-Wno-sign-conversion \
++			-Wno-infinite-recursion \
++			-Wno-comma \
++			-Wno-block-capture-autoreleasing \
++			-Wno-strict-prototypes \
++			-MMD -MT dependencies \
++			$(CPPFLAGS)
++
++ifneq (,$(SDKROOT))
++CPPFLAGS += -isysroot $(SDKROOT)
++endif
++ifneq (,$(MACOSX_DEPLOYMENT_TARGET))
++CPPFLAGS += -mmacosx-version-min=$(MACOSX_DEPLOYMENT_TARGET)
++endif
++
++CFLAGS   := -Wpointer-sign $(OTHER_CFLAGS) $(CFLAGS)
++CXXFLAGS := -fno-sanitize=vptr \
++			-Wno-non-virtual-dtor \
++			-Wno-exit-time-destructors \
++			-Wno-c++11-extensions \
++			-Winvalid-offsetof \
++			-Wno-move \
++			-Wno-range-loop-analysis \
++			$(OTHER_CXXFLAGS) $(CXXFLAGS)
++
++
++#--------------------------------------------------
++# Building targets
++#--------------------------------------------------
++
++CXX_FILES  := $(shell ls src/*.cxx | sort -k 1,1 -t .)
++CC_FILES   := $(shell ls src/*.c | sort -k 1,1 -t .)
++ASM_FILES  := $(shell ls src/*.s | sort -k 1,1 -t .)
++
++OBJ_TARGETS = $(addsuffix .o,$(CXX_FILES) $(CC_FILES) $(ASM_FILES))
++FILELIST    = $(CXX_FILES:.cxx=.o) $(CC_FILES:.c=.o) $(ASM_FILES:.s=.o)
++
++
++.PHONY: all clean install uninstall
++
++all: lib
++lib: dyld-libunwind.a libunwind.dylib
++dyld-libunwind.a: libunwind.a
++
++clean:
++	$(Q)$(RM) *.a *.dylib src/*.o src/*.d
++	@echo Cleaning library completed
++
++#
++# Static library
++#
++libunwind.a: CPPFLAGS += -DFOR_DYLD
++ifneq (,$(SDKROOT))
++libunwind.a: LDFLAGS  += -syslibroot $(SDKROOT)
++endif
++libunwind.a: $(OBJ_TARGETS)
++	@echo compiling static library
++	$(Q)$(LIBTOOL) -static -arch_only $(ARCH) $(LDFLAGS) -o $@ - $(FILELIST)
++
++#
++# Dynamic library
++#
++libunwind.dylib: CXXFLAGS := -fvisibility-inlines-hidden $(CXXFLAGS)
++ifeq ($(RELEASE), 1)
++libunwind.dylib: CPPFLAGS := $(subst -O3,-Os,$(CPPFLAGS))
++libunwind.dylib: LDFLAGS  := -L/usr/lib/system -dead_strip $(LDFLAGS) \
++	-Xlinker -order_file -Xlinker libunwind.order
++else
++libunwind.dylib: CPPFLAGS := $(subst -Wdeprecated-,-Wno-deprecated-,$(CPPFLAGS))
++libunwind.dylib: LDFLAGS  := -Xlinker -no_deduplicate $(LDFLAGS)
++endif
++libunwind.dylib: LDFLAGS  := -install_name /usr/lib/system/libunwind.dylib \
++	-L$(SDKROOT)/usr/lib/system -nodefaultlibs -lsystem_malloc -lsystem_pthread \
++	-lsystem_platform -lsystem_c -ldyld -lkeymgr -Wl,-umbrella,System -single_module \
++	-compatibility_version $(VER_MAJOR).0 -current_version $(VERSION) $(LDFLAGS) \
++	$(filter -isysroot $(SDKROOT) -mmacosx% -stdlib%,$(CPPFLAGS) $(CXXFLAGS))
++libunwind.dylib: $(OBJ_TARGETS)
++	@echo compiling dynamic library
++	$(Q)$(CXX) -dynamiclib -arch $(ARCH) $(LDFLAGS) -o $@ $(FILELIST)
++
++#
++# Building parts
++#
++
++%.cxx.o: %.cxx
++	$(Q)$(CXX) $(CPPFLAGS) $(CXXFLAGS) -o $(@:.cxx.o=.o) -c $<
++
++%.c.o: %.c
++	$(Q)$(CC) $(CPPFLAGS) $(CFLAGS) -o $(@:.c.o=.o) -c $<
++
++%.s.o: %.s
++	$(Q)$(ASM) $(CPPFLAGS) $(OTHER_CFLAGS) -o $(@:.s.o=.o) -c $<
++
++
++#--------------------------------------------------
++# Installation targets
++#--------------------------------------------------
++
++prefix      ?= /usr/local
++PREFIX      ?= $(prefix)
++exec_prefix ?= $(PREFIX)
++EXEC_PREFIX ?= $(exec_prefix)
++libdir      ?= $(EXEC_PREFIX)/lib
++LIBDIR      ?= $(libdir)
++includedir  ?= $(PREFIX)/include
++INCLUDEDIR  ?= $(includedir)
++
++ifneq (,$(filter $(shell uname),SunOS))
++INSTALL ?= ginstall
++else
++INSTALL ?= install
++endif
++
++INSTALL_PROGRAM ?= $(INSTALL)
++INSTALL_DATA    ?= $(INSTALL) -m 644
++
++
++install: install-static install-shared install-includes
++	@echo unwind static and shared library installed
++
++uninstall: uninstall-static uninstall-shared uninstall-includes
++	@echo unwind libraries successfully uninstalled
++
++install-static: dyld-libunwind.a
++	@echo Installing static library
++	$(Q)$(INSTALL) -d -m 755 $(LIBDIR)/
++	$(Q)$(INSTALL_DATA) libunwind.a $(LIBDIR)
++
++uninstall-static:
++	$(Q)$(RM) $(LIBDIR)/libunwind.a
++
++install-shared: libunwind.dylib
++	@echo Installing shared library
++	$(Q)$(INSTALL) -d -m 755 $(LIBDIR)/
++	$(Q)$(INSTALL_PROGRAM) libunwind.dylib $(LIBDIR)
++
++uninstall-shared:
++	$(Q)$(RM) $(LIBDIR)/libunwind.dylib
++
++install-includes:
++	@echo Installing includes
++	$(Q)$(INSTALL) -d -m 755 $(INCLUDEDIR)/mach-o/
++	$(Q)$(INSTALL_DATA) include/unwind.h $(INCLUDEDIR)
++	$(Q)$(INSTALL_DATA) include/libunwind.h $(INCLUDEDIR)
++	$(Q)$(INSTALL_DATA) include/mach-o/compact_unwind_encoding.h $(INCLUDEDIR)/mach-o
++
++uninstall-includes:
++	$(Q)$(RM) $(INCLUDEDIR)/unwind.h
++	$(Q)$(RM) $(INCLUDEDIR)/libunwind.h
++	$(Q)$(RM) $(INCLUDEDIR)/mach-o/compact_unwind_encoding.h
