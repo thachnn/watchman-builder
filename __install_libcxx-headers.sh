@@ -19,14 +19,11 @@ then
   rm -f "${_TMPCXX_TEST#* -c }"*
 else
 (
-  _CLANG_VER='/Library/Developer/CommandLineTools/usr /Applications/Xcode.app/Contents/Developer/Toolchains'
-  _CLANG_VER="$(basename "`find $_CLANG_VER -regex '.*/clang/[0-9][^/]*' -print -quit`")"
+  _PKG_VER="$( $_SC_DIR/get_clang_ver.sh || echo 9.0.0 )"
+  _CXX_PKG="libcxx-$_PKG_VER.src"
 
-  _CXX_PKG="libcxx-$_CLANG_VER.src"
   cd "$_SCRATCH_DIR"
-  [[ -s "$_CXX_PKG.tar.xz" ]] || \
-    curl -OkfSL "https://releases.llvm.org/$_CLANG_VER/$_CXX_PKG.tar.xz"
-
+  [[ -s "$_CXX_PKG.tar.xz" ]] || curl -OkSL "https://releases.llvm.org/$_PKG_VER/$_CXX_PKG.tar.xz"
   tar -C "$_PREFIX" -xf "$_CXX_PKG.tar.xz" --strip-components=1 "$_CXX_PKG/include/variant"
 
   sed -i '' -e '/^#include <version>/d;/^_LIBCPP_PUSH_MACROS/d;/^_LIBCPP_POP_MACROS/d' \
