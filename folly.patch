@@ -53,6 +53,19 @@ index ffa043c1f..039a10242 100644
  libdir=${exec_prefix}/@CMAKE_INSTALL_LIBDIR@
  includedir=${prefix}/@CMAKE_INSTALL_INCLUDEDIR@
  
+diff --git a/folly/io/async/test/EventBaseTestLib.h b/folly/io/async/test/EventBaseTestLib.h
+index da2484490..4b99f6080 100644
+--- a/folly/io/async/test/EventBaseTestLib.h
++++ b/folly/io/async/test/EventBaseTestLib.h
+@@ -2235,7 +2235,7 @@ TYPED_TEST_P(EventBaseTest1, DrivableExecutorTest) {
+   folly::EventBase& base = *eventBasePtr;
+   bool finished = false;
+ 
+-  Baton baton;
++  Baton<> baton;
+ 
+   std::thread t([&] {
+     baton.wait();
 diff --git a/folly/test/MapUtilTest.cpp b/folly/test/MapUtilTest.cpp
 index cd44ea823..0d71f8cf8 100644
 --- a/folly/test/MapUtilTest.cpp
@@ -83,3 +96,31 @@ index cd44ea823..0d71f8cf8 100644
  
  TEST(MapUtil, get_ref_default) {
    std::map<int, int> m;
+diff --git a/folly/test/MemoryTest.cpp b/folly/test/MemoryTest.cpp
+index f2f3c0a5d..c26d3ece9 100644
+--- a/folly/test/MemoryTest.cpp
++++ b/folly/test/MemoryTest.cpp
+@@ -87,7 +87,7 @@ TEST(make_unique, compatible_with_std_make_unique) {
+ }
+ 
+ TEST(to_shared_ptr_aliasing, example) {
+-  auto sp = folly::copy_to_shared_ptr(std::tuple{3, 4});
++  auto sp = folly::copy_to_shared_ptr(std::tuple<int, int>{3, 4});
+   auto a = folly::to_shared_ptr_aliasing(sp, &std::get<1>(*sp));
+   EXPECT_EQ(4, *a);
+ }
+diff --git a/folly/test/TraitsTest.cpp b/folly/test/TraitsTest.cpp
+index fd6e6d63e..f4356771d 100644
+--- a/folly/test/TraitsTest.cpp
++++ b/folly/test/TraitsTest.cpp
+@@ -109,8 +109,10 @@ TEST(Traits, conditional) {
+ 
+   EXPECT_TRUE(Cond<false>::fun_std("hello"));
+   EXPECT_TRUE(Cond<true>::fun_std("hello"));
++#if __cplusplus >= 201703L
+   EXPECT_TRUE(Cond<false>::fun_folly("hello"));
+   EXPECT_FALSE(Cond<true>::fun_folly("hello"));
++#endif
+ }
+ 
+ TEST(Trait, logicOperators) {

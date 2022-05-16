@@ -1,5 +1,5 @@
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 3dbcd68a..64be8948 100644
+index 3dbcd68..d6cd11e 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
 @@ -23,7 +23,6 @@ option(BUILD_SHARED_LIBS
@@ -93,6 +93,15 @@ index 3dbcd68a..64be8948 100644
  if(WIN32)
    if(Python3_Interpreter_FOUND AND NODE AND YARN)
      add_subdirectory(node/bser)
+@@ -457,7 +470,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+   set(CMAKE_STATIC_LIBRARY_FLAGS
+     "${CMAKE_STATIC_LIBRARY_FLAGS} /DEBUG /MT /OPT:NOREF")
+ else()
+-  set(CMAKE_CXX_FLAGS_COMMON "-g -Wall -Wextra -std=gnu++17")
++  set(CMAKE_CXX_FLAGS_COMMON "-Wall -Wextra -std=gnu++17")
+   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_COMMON}")  # for cmake 3.0
+   set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_COMMON}")
+   set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_COMMON} -O3")
 @@ -738,6 +751,8 @@ endif()
  
  install(TARGETS watchman RUNTIME DESTINATION bin)
@@ -108,3 +117,15 @@ index 3dbcd68a..64be8948 100644
  t_test(MapUtilTest tests/MapUtilTest.cpp)
 +
 +endif()
+diff --git a/build/fbcode_builder/CMake/FBCompilerSettingsUnix.cmake b/build/fbcode_builder/CMake/FBCompilerSettingsUnix.cmake
+index c095ec8..408fad5 100644
+--- a/build/fbcode_builder/CMake/FBCompilerSettingsUnix.cmake
++++ b/build/fbcode_builder/CMake/FBCompilerSettingsUnix.cmake
+@@ -6,6 +6,6 @@
+ # to these shared compiler settings in order to avoid accidentally
+ # breaking a build in another project!
+ 
+-set(CMAKE_CXX_FLAGS_COMMON "-g -Wall -Wextra -Wno-deprecated -Wno-deprecated-declarations")
++set(CMAKE_CXX_FLAGS_COMMON "-Wall -Wextra -Wno-deprecated -Wno-deprecated-declarations")
+ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${CMAKE_CXX_FLAGS_COMMON}")
+ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${CMAKE_CXX_FLAGS_COMMON} -O3")

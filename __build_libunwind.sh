@@ -17,7 +17,7 @@ then
 
   # Install static library
   cd "$_PREFIX/lib"
-  patch -p1 -i "$_SC_DIR/libunwind.patch"
+  git apply "$_SC_DIR/libunwind.patch"
 
   echo '2b89581fe31d091a1bbe015beda13565598f148785c85c0cf9e317a3a68f5b48 *libunwind.a' \
     | shasum -c
