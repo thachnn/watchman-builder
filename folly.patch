@@ -21,3 +21,14 @@ index a0479e6db..f404f83eb 100644
  find_package(LZ4 MODULE)
  set(FOLLY_HAVE_LIBLZ4 ${LZ4_FOUND})
  if (LZ4_FOUND)
+diff --git a/CMake/libfolly.pc.in b/CMake/libfolly.pc.in
+index ffa043c1f..039a10242 100644
+--- a/CMake/libfolly.pc.in
++++ b/CMake/libfolly.pc.in
+@@ -1,5 +1,5 @@
+ prefix=@CMAKE_INSTALL_PREFIX@
+-exec_prefix=@CMAKE_INSTALL_PREFIX@
++exec_prefix=${prefix}
+ libdir=${exec_prefix}/@CMAKE_INSTALL_LIBDIR@
+ includedir=${prefix}/@CMAKE_INSTALL_INCLUDEDIR@
+ 
