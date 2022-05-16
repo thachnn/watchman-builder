@@ -1,0 +1,115 @@
+diff --git a/__undef_macros b/__undef_macros
+new file mode 100644
+index 0000000..6e1a589
+--- /dev/null
++++ b/__undef_macros
+@@ -0,0 +1,109 @@
++// -*- C++ -*-
++
++#ifndef _LIBCPP_AVAILABILITY_BAD_VARIANT_ACCESS
++#  define _LIBCPP_AVAILABILITY_BAD_VARIANT_ACCESS _LIBCPP_AVAILABILITY_BAD_ANY_CAST
++#endif
++#ifndef _LIBCPP_AVAILABILITY_THROW_BAD_VARIANT_ACCESS
++#  define _LIBCPP_AVAILABILITY_THROW_BAD_VARIANT_ACCESS _LIBCPP_AVAILABILITY_THROW_BAD_ANY_CAST
++#endif
++
++#ifndef _LIBCPP_INLINE_VAR
++#if _LIBCPP_STD_VER > 14 && defined(__cpp_inline_variables) && (__cpp_inline_variables >= 201606L)
++#  define _LIBCPP_INLINE_VAR inline
++#else
++#  define _LIBCPP_INLINE_VAR
++#endif
++#endif
++
++#ifndef _LIBCPP_NODEBUG_TYPE
++#if __has_attribute(__nodebug__) && defined(_LIBCPP_COMPILER_CLANG) && (_LIBCPP_CLANG_VER >= 900)
++#  define _LIBCPP_NODEBUG_TYPE __attribute__((nodebug))
++#else
++#  define _LIBCPP_NODEBUG_TYPE
++#endif
++#endif
++
++_LIBCPP_BEGIN_NAMESPACE_STD
++
++//{ Missing type traits
++
++template <bool> struct _MetaBase;
++template <>
++struct _MetaBase<true> {
++  template <class _Tp, class _Up>
++  using _SelectImpl _LIBCPP_NODEBUG_TYPE = _Tp;
++};
++
++template <>
++struct _MetaBase<false> {
++  template <class _Tp, class _Up>
++  using _SelectImpl _LIBCPP_NODEBUG_TYPE = _Up;
++};
++template <bool _Cond, class _IfRes, class _ElseRes>
++using _If _LIBCPP_NODEBUG_TYPE = typename _MetaBase<_Cond>::template _SelectImpl<_IfRes, _ElseRes>;
++
++#ifndef _LIBCPP_CXX03_LANG
++
++#if _LIBCPP_STD_VER > 14
++// invoke_result
++template <class _Fn, class... _Args>
++struct _LIBCPP_TEMPLATE_VIS invoke_result : __invoke_of<_Fn, _Args...> {};
++
++template <class _Fn, class... _Args>
++using invoke_result_t = typename invoke_result<_Fn, _Args...>::type;
++
++// is_invocable
++template <class _Fn, class ..._Args>
++struct _LIBCPP_TEMPLATE_VIS is_invocable : integral_constant<bool, __invokable<_Fn, _Args...>::value> {};
++
++template <class _Fn, class ..._Args>
++_LIBCPP_INLINE_VAR constexpr bool is_invocable_v = is_invocable<_Fn, _Args...>::value;
++#endif
++
++#endif
++
++//}
++
++//{ Missing utilities
++
++#ifndef _LIBCPP_CXX03_LANG
++
++template <class _Key, class _Hash>
++using __check_hash_requirements _LIBCPP_NODEBUG_TYPE = integral_constant<bool,
++    is_copy_constructible<_Hash>::value &&
++    is_move_constructible<_Hash>::value &&
++    __invokable_r<size_t, _Hash, _Key const&>::value
++>;
++
++template <class _Key, class _Hash = std::hash<_Key> >
++using __has_enabled_hash _LIBCPP_NODEBUG_TYPE = integral_constant<bool,
++    __check_hash_requirements<_Key, _Hash>::value &&
++    is_default_constructible<_Hash>::value
++>;
++
++#if _LIBCPP_STD_VER > 14
++template <class _Type, class>
++using __enable_hash_helper_imp _LIBCPP_NODEBUG_TYPE = _Type;
++
++template <class _Type, class ..._Keys>
++using __enable_hash_helper _LIBCPP_NODEBUG_TYPE = __enable_hash_helper_imp<_Type,
++    typename enable_if<__all<__has_enabled_hash<_Keys>::value...>::value>::type
++>;
++#else
++template <class _Type, class ...>
++using __enable_hash_helper _LIBCPP_NODEBUG_TYPE = _Type;
++#endif
++
++#endif
++
++#if _LIBCPP_STD_VER > 14
++template <class _Tp> struct __is_inplace_index_imp : false_type {};
++template <size_t _Idx> struct __is_inplace_index_imp<in_place_index_t<_Idx>> : true_type {};
++
++template <class _Tp>
++using __is_inplace_index = __is_inplace_index_imp<__uncvref_t<_Tp>>;
++#endif
++
++//}
++
++_LIBCPP_END_NAMESPACE_STD
