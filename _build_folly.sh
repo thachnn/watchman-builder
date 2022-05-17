@@ -23,6 +23,7 @@ then
   # Fix package finding issues
   patch -p1 -i "$_SC_DIR/folly.patch"
 
+  sed -i- 's/:\${CMAKE_BINARY_DIR}//' CMakeLists.txt
   [[ "$_NO_TESTS" == 0 ]] && _BUILD_TESTS=ON || _BUILD_TESTS=OFF
 
   cmake . -DCMAKE_BUILD_TYPE=Release -DCMAKE_FIND_FRAMEWORK=LAST \
@@ -33,6 +34,8 @@ then
 
   # Use relative paths
   find CMakeFiles -name build.make -exec sed -i- "s:-c $PWD/:-c :" {} +
+  find CMakeFiles -name flags.make -exec sed -i- "s:-I$PWD:-I.:g" {} +
+  find */CMakeFiles -name build.make -exec sed -i- "s:-c $PWD/[^ /]*/:-c :" {} +
 
   make -j2 install
   [[ "$_NO_TESTS" != 0 ]] || make test

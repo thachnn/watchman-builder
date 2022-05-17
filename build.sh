@@ -26,7 +26,7 @@ while [[ $# -gt 0 ]]; do
     ;;
   --unit-test)
     _NO_TESTS=0
-    _EXTRA_ARGS="$_EXTRA_ARGS -DBUILD_TESTING=OFF"
+    _EXTRA_ARGS="$_EXTRA_ARGS -DBUILD_TESTING=ON"
     ;;
   --with-os-libs)
     _WITH_OS_LIBS=1
@@ -54,7 +54,7 @@ done
 # Boost
 "$_SC_DIR/__build_icu4c.sh" "$_PREFIX" "$_SCRATCH_DIR"
 "$_SC_DIR/_build_boost.sh" "$_PREFIX" "$_SCRATCH_DIR" \
-  'regex,thread,filesystem,system,context,program_options'
+  'regex,thread,date_time,filesystem,system,chrono,context,atomic,program_options'
 
 # GoogleTest
 [[ "$_NO_TESTS" != 0 ]] || "$_SC_DIR/_build_googletest.sh" "$_PREFIX" "$_SCRATCH_DIR"

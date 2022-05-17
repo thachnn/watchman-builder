@@ -18,12 +18,14 @@ cd "$_PKG"
 # Add `testing` option
 patch -p1 -i "$_SC_DIR/watchman.patch"
 
-[[ "$_NO_TESTS" == 0 ]] && _BUILD_TESTS=ON || _BUILD_TESTS=OFF
-
 cmake . -DCMAKE_BUILD_TYPE=Release -DCMAKE_FIND_FRAMEWORK=LAST \
-  -DCMAKE_VERBOSE_MAKEFILE=ON -Wno-dev "-DBUILD_TESTING=$_BUILD_TESTS" $_EXTRA_ARGS \
+  -DCMAKE_VERBOSE_MAKEFILE=ON -Wno-dev -DBUILD_TESTING=OFF $_EXTRA_ARGS \
   "-DCMAKE_INSTALL_PREFIX=$_PREFIX" "-DCMAKE_PREFIX_PATH=$_PREFIX" \
   "-DWATCHMAN_VERSION_OVERRIDE=${_PKG#*-}" "-DWATCHMAN_BUILDINFO_OVERRIDE=$USER"
 
+# Use relative paths
+find CMakeFiles -name build.make -exec sed -i- "s:-c $PWD/:-c :" {} +
+find CMakeFiles -name flags.make -exec sed -i- "s:-I$PWD:-I.:g" {} +
+
 make -j2 install
-[[ "$_NO_TESTS" != 0 ]] || make test
+[[ "$_NO_TESTS" != 0 ]] || make check
