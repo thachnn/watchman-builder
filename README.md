@@ -11,6 +11,7 @@ Provide a simple way to build [Watchman](https://github.com/facebook/watchman) f
 export PATH="/Library/Developer/CommandLineTools/usr/bin:${PATH}"
 export CC=clang
 export CXX=clang++
+export SDKROOT=/Library/Developer/CommandLineTools/SDKs/MacOSX10.14.sdk
 ```
 
 ## Usage

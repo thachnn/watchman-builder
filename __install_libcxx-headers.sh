@@ -21,7 +21,7 @@ then
   _PKG_="libcxx-$_VER_.src"
 
   cd "$_SCRATCH_DIR"
-  [[ -s "$_PKG_.tar.xz" ]] || curl -OkSL "https://releases.llvm.org/$_VER_/$_PKG_.tar.xz"
+  [[ -s "$_PKG_.tar.xz" ]] || "$_SC_DIR/download_llvm_pkg.sh" "$_PKG_" "$_VER_"
   tar -C "$_PREFIX" -xf "$_PKG_.tar.xz" --strip-components=1 "$_PKG_/include/variant"
 
   cd "$_PREFIX/include"
