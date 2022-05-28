@@ -9,7 +9,7 @@ if [[ ! -e "$_PREFIX/lib/cmake/double-conversion" ]]
 then
   cd "$_SCRATCH_DIR"
   [[ -s "$_PKG.tgz" ]] || \
-    curl -o "$_PKG.tgz" -kSL "https://github.com/google/double-conversion/archive/v${_PKG##*-}.tar.gz"
+    curl -o "$_PKG.tgz" -kfSL "https://github.com/google/double-conversion/archive/v${_PKG##*-}.tar.gz"
   rm -rf "$_PKG"
   tar -xf "$_PKG.tgz"
 

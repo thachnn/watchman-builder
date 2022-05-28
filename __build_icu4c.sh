@@ -10,7 +10,7 @@ then
   cd "$_SCRATCH_DIR"
   while ! shasum -cs <<< "627d5d8478e6d96fc8c90fed4851239079a561a6a8b9e48b0892f24e82d31d6c *$_PKG-src.tgz"
   do
-    curl -OkSL "https://github.com/unicode-org/icu/releases/download/release-${_PKG:6:2}-${_PKG:9}/$_PKG-src.tgz"
+    curl -OkfSL "https://github.com/unicode-org/icu/releases/download/release-${_PKG:6:2}-${_PKG:9}/$_PKG-src.tgz"
   done
   rm -rf icu
   tar -xf "$_PKG-src.tgz"

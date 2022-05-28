@@ -20,6 +20,7 @@ while [[ $# -gt 0 ]]; do
     ;;
   --state-dir=*)
     _EXTRA_ARGS="$_EXTRA_ARGS -DWATCHMAN_STATE_DIR=${1#*=}"
+    _EXTRA_ARGS="$_EXTRA_ARGS -DINSTALL_WATCHMAN_STATE_DIR=ON"
     ;;
   --config-file=*)
     _EXTRA_ARGS="$_EXTRA_ARGS -DWATCHMAN_CONFIG_FILE=${1#*=}"

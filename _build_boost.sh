@@ -12,7 +12,7 @@ then
   cd "$_SCRATCH_DIR"
   while ! shasum -cs <<< "8f32d4617390d1c2d16f26a27ab60d97807b35440d45891fa340fc2648b04406 *$_PKG.tar.bz2"
   do
-    curl -OkSL "https://boostorg.jfrog.io/artifactory/main/release/$(tr _ . <<< "${_PKG:6}")/source/$_PKG.tar.bz2"
+    curl -OkfSL "https://boostorg.jfrog.io/artifactory/main/release/$(tr _ . <<< "${_PKG:6}")/source/$_PKG.tar.bz2"
   done
   rm -rf "$_PKG"
   tar -xf "$_PKG.tar.bz2"

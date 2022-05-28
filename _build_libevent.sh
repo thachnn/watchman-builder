@@ -9,7 +9,7 @@ if [[ ! -e "$_PREFIX/lib/libevent.a" ]]
 then
   cd "$_SCRATCH_DIR"
   [[ -s "$_PKG.tar.gz" ]] || \
-    curl -OkSL "https://github.com/libevent/libevent/releases/download/release-${_PKG#*-}/$_PKG.tar.gz"
+    curl -OkfSL "https://github.com/libevent/libevent/releases/download/release-${_PKG#*-}/$_PKG.tar.gz"
   rm -rf "$_PKG"
   tar -xf "$_PKG.tar.gz"
 

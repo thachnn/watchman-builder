@@ -8,7 +8,7 @@ _SCRATCH_DIR="$2"
 if [[ ! -x "$_PREFIX/bin/pcre-config" ]]
 then
   cd "$_SCRATCH_DIR"
-  [[ -s "$_PKG.tar.bz2" ]] || curl -OkSL "https://ftp.exim.org/pub/pcre/$_PKG.tar.bz2"
+  [[ -s "$_PKG.tar.bz2" ]] || curl -OkfSL "https://ftp.exim.org/pub/pcre/$_PKG.tar.bz2"
   rm -rf "$_PKG"
   tar -xf "$_PKG.tar.bz2"
 

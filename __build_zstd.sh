@@ -9,7 +9,7 @@ if [[ ! -e "$_PREFIX/include/zstd.h" ]]
 then
   cd "$_SCRATCH_DIR"
   [[ -s "$_PKG.tar.gz" ]] || \
-    curl -OkSL "https://github.com/facebook/zstd/releases/download/v${_PKG#*-}/$_PKG.tar.gz"
+    curl -OkfSL "https://github.com/facebook/zstd/releases/download/v${_PKG#*-}/$_PKG.tar.gz"
   rm -rf "$_PKG"
   tar -xf "$_PKG.tar.gz"
 

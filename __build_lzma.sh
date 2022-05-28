@@ -9,7 +9,7 @@ if [[ ! -e "$_PREFIX/include/lzma.h" ]]
 then
   cd "$_SCRATCH_DIR"
   [[ -s "$_PKG.tar.bz2" ]] || \
-    curl -OkSL "https://downloads.sourceforge.net/project/lzmautils/$_PKG.tar.bz2"
+    curl -OkfSL "https://downloads.sourceforge.net/project/lzmautils/$_PKG.tar.bz2"
   rm -rf "$_PKG"
   tar -xf "$_PKG.tar.bz2"
 

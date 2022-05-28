@@ -9,7 +9,7 @@ if [[ ! -e "$_PREFIX/lib/cmake/Snappy" ]]
 then
   cd "$_SCRATCH_DIR"
   [[ -s "$_PKG.tgz" ]] || \
-    curl -o "$_PKG.tgz" -kSL "https://github.com/google/snappy/archive/${_PKG#*-}.tar.gz"
+    curl -o "$_PKG.tgz" -kfSL "https://github.com/google/snappy/archive/${_PKG#*-}.tar.gz"
   rm -rf "$_PKG"
   tar -xf "$_PKG.tgz"
 

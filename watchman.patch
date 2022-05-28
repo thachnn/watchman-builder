@@ -1,5 +1,5 @@
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 3dbcd68..d6cd11e 100644
+index 3dbcd68..49ae2d7 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
 @@ -23,7 +23,6 @@ option(BUILD_SHARED_LIBS
@@ -27,15 +27,11 @@ index 3dbcd68..d6cd11e 100644
  set(PACKAGE_BUGREPORT "https://github.com/facebook/watchman/issues")
  project(${PACKAGE_NAME} CXX C)
  
--find_package(GMock MODULE REQUIRED)
--include_directories(${GMOCK_INCLUDEDIR} ${LIBGMOCK_INCLUDE_DIR})
--include(GoogleTest)
--enable_testing()
 +if (BUILD_TESTING)
-+  find_package(GMock MODULE REQUIRED)
-+  include_directories(${GMOCK_INCLUDEDIR} ${LIBGMOCK_INCLUDE_DIR})
-+  include(GoogleTest)
-+  enable_testing()
+ find_package(GMock MODULE REQUIRED)
+ include_directories(${GMOCK_INCLUDEDIR} ${LIBGMOCK_INCLUDE_DIR})
+ include(GoogleTest)
+ enable_testing()
 +endif()
  
  include(FBThriftCppLibrary)
@@ -84,15 +80,15 @@ index 3dbcd68..d6cd11e 100644
  if(WIN32)
    find_package(Python3 COMPONENTS Interpreter Development)
  
-@@ -430,6 +441,8 @@ else()
+@@ -440,6 +451,8 @@ else()
    endif()
  endif()
  
 +endif()
 +
- if(WIN32)
-   if(Python3_Interpreter_FOUND AND NODE AND YARN)
-     add_subdirectory(node/bser)
+ if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+   # Check target architecture
+   if (NOT CMAKE_SIZEOF_VOID_P EQUAL 8)
 @@ -457,7 +470,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
    set(CMAKE_STATIC_LIBRARY_FLAGS
      "${CMAKE_STATIC_LIBRARY_FLAGS} /DEBUG /MT /OPT:NOREF")
@@ -102,7 +98,25 @@ index 3dbcd68..d6cd11e 100644
    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_COMMON}")  # for cmake 3.0
    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_COMMON}")
    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_COMMON} -O3")
-@@ -738,6 +751,8 @@ endif()
+@@ -534,6 +547,8 @@ thirdparty/jansson/value.cpp
+ )
+ target_link_libraries(jansson string third_party_deps)
+ 
++if (BUILD_TESTING)
++
+ list(APPEND testsupport_sources
+ ChildProcess.cpp
+ FileDescriptor.cpp
+@@ -565,6 +580,8 @@ endif()
+ add_library(testsupport STATIC ${testsupport_sources})
+ target_link_libraries(testsupport log string jansson third_party_deps)
+ 
++endif()
++
+ if (ENABLE_EDEN_SUPPORT)
+   add_fbthrift_cpp_library(
+     eden_config_thrift
+@@ -738,6 +755,8 @@ endif()
  
  install(TARGETS watchman RUNTIME DESTINATION bin)
  
@@ -111,7 +125,7 @@ index 3dbcd68..d6cd11e 100644
  set(tests)
  # Helper function to define a unit test executable
  function(t_test NAME)
-@@ -795,3 +810,5 @@ t_test(childproc tests/childproc.cpp)
+@@ -795,3 +814,5 @@ t_test(childproc tests/childproc.cpp)
  t_test(result tests/ResultTest.cpp)
  t_test(cache tests/CacheTest.cpp)
  t_test(MapUtilTest tests/MapUtilTest.cpp)

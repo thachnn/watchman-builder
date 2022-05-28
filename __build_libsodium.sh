@@ -10,7 +10,7 @@ if [[ ! -e "$_PREFIX/lib/libsodium.a" ]]
 then
   cd "$_SCRATCH_DIR"
   [[ -s "$_PKG.tar.gz" ]] || \
-    curl -OkSL "https://download.libsodium.org/libsodium/releases/$_PKG.tar.gz"
+    curl -OkfSL "https://download.libsodium.org/libsodium/releases/$_PKG.tar.gz"
   rm -rf "$_DIR"
   tar -xf "$_PKG.tar.gz"
 

@@ -8,7 +8,7 @@ _SCRATCH_DIR="$2"
 if [[ ! -e "$_PREFIX/include/openssl" ]]
 then
   cd "$_SCRATCH_DIR"
-  [[ -s "$_PKG.tar.gz" ]] || curl -OkSL "https://ftp.openssl.org/source/$_PKG.tar.gz"
+  [[ -s "$_PKG.tar.gz" ]] || curl -OkfSL "https://ftp.openssl.org/source/$_PKG.tar.gz"
   rm -rf "$_PKG"
   tar -xf "$_PKG.tar.gz"
 
