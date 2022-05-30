@@ -20,6 +20,7 @@ then
     tar -xf "$_PKG.tar.gz"
 
     # Install files
+    mkdir -p "$_PREFIX"
     cp -af "$_PKG/CMake.app/Contents/bin" "$_PREFIX/"
     cp -af "$_PKG/CMake.app/Contents/share" "$_PREFIX/"
     rm -rf "$_PKG"

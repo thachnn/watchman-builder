@@ -13,8 +13,9 @@ then
   tar -xf "$_PKG.tar.gz"
 
   cd "$_PKG"
-  perl Configure darwin64-x86_64-cc enable-ec_nistp_64_gcc_128 "--prefix=$_PREFIX" \
-    no-shared enable-static-engine no-unit-test no-tests
+  # enable-ec_nistp_64_gcc_128
+  perl Configure darwin64-x86_64-cc "--prefix=$_PREFIX" no-shared \
+    enable-static-engine no-tests
 
   # Build lib only
   sed -i- 's,^LIBS=apps/libapps\.a ,LIBS=,' Makefile

@@ -24,11 +24,15 @@ then
   [[ -s "$_PKG_.tar.xz" ]] || "$_SC_DIR/download_llvm_pkg.sh" "$_PKG_" "$_VER_"
   tar -C "$_PREFIX" -xf "$_PKG_.tar.xz" --strip-components=1 "$_PKG_/include/variant"
 
-  cd "$_PREFIX/include"
-  patch -p1 -i "$_SC_DIR/libcxx-headers.patch"
-
-  sed -i '' -e '/^_LIBCPP_PUSH_MACROS/d;/^_LIBCPP_POP_MACROS/d' \
-    -e '/^#include <version>/d' variant
+  # Patching...
+  sed -i '' -e '/^#include <version>/d;/^#include <__undef_macros>/d' \
+    -e '/^_LIBCPP_PUSH_MACROS/d;/^_LIBCPP_POP_MACROS/d' \
+    -e 's/\(_LIBCPP_AVAILABILITY_[H-W_]*BAD\)_VARIANT_ACCESS/\1_ANY_CAST/g' \
+    -e 's/_LIBCPP_INLINE_VAR /inline /g;s/_LIBCPP_NODEBUG_TYPE //g' \
+    -e 's/ _If</ conditional_t</g;s/invoke_result_t</__invoke_of</g' \
+    -e 's/is_invocable_v\(<[^>]*>\)/bool_constant<__invokable\1::value>::value/g' \
+    -e 's/__enable_hash_helper<\([^,]*\), [^ ,]*\.>/\1/g' \
+    -e 's/__is_inplace_index</__is_inplace_type</g' "$_PREFIX/include/variant"
 
   ${CXX:-clang++} $_TMPCXX_ > /dev/null
 )
