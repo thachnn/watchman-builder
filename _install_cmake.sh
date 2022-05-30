@@ -16,14 +16,11 @@ then
     do
       curl -OkfSL "https://github.com/Kitware/CMake/releases/download/v${_PKG:6:6}/$_PKG.tar.gz"
     done
-    rm -rf "$_PKG"
-    tar -xf "$_PKG.tar.gz"
 
     # Install files
     mkdir -p "$_PREFIX"
-    cp -af "$_PKG/CMake.app/Contents/bin" "$_PREFIX/"
-    cp -af "$_PKG/CMake.app/Contents/share" "$_PREFIX/"
-    rm -rf "$_PKG"
+    tar -C "$_PREFIX" -xf "$_PKG.tar.gz" --strip-components=3 "$_PKG/CMake.app/Contents"/{bin,share}
+    rm -f "$_PREFIX/bin/cmake-gui"
   )
   fi
 

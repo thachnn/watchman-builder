@@ -14,6 +14,10 @@ then
   tar -xf "$_PKG.tgz"
 
   cd "$_PKG"
+  # Patch .pc.in files
+  sed -i- -e $'s/^libdir=/prefix=@CMAKE_INSTALL_PREFIX@\\\n&/' \
+    -e 's|=@CMAKE_INSTALL_FULL_|=${prefix}/@CMAKE_INSTALL_|' */cmake/*.pc.in
+
   cmake . -DCMAKE_BUILD_TYPE=Release -DCMAKE_FIND_FRAMEWORK=LAST \
     -DCMAKE_VERBOSE_MAKEFILE=ON -Wno-dev "-DCMAKE_INSTALL_PREFIX=$_PREFIX"
 

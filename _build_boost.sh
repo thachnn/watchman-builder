@@ -23,7 +23,7 @@ then
   ./bootstrap.sh "--prefix=$_PREFIX" "--with-icu=$_PREFIX" "--with-libraries=$_LIBRARIES"
 
   # Fix slow headers copying
-  rsync -aW --exclude='*.'{cpp,pl,py,erb,re,txt,patch,m4,bat,sh,dtd,natvis} boost "$_PREFIX/include"
+  rsync -aW --include='*.'{hpp,h,ipp,inc} --exclude='*.*' boost "$_PREFIX/include"
 
   # Clang compiler may need `cxxflags=-stdlib=libc++ linkflags=-stdlib=libc++`
   ./b2 -d2 -j2 --user-config=user-config.jam variant=release cxxflags=-std=c++14 install \

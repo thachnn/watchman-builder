@@ -22,9 +22,9 @@ then
 
   # Use relative paths
   find CMakeFiles -name build.make -exec sed -i- "s:-c $PWD/:-c :" {} +
-  make -j2 install
+  find CMakeFiles -name flags.make -exec sed -i- "s:$PWD/::g" {} +
 
+  make -j2 install
   # Correct .pc file
-  sed -i '' -e "s|=$_PREFIX|=\${prefix}|" -e "s|^prefix=\\\$.*|prefix=$_PREFIX|" \
-    -e 's|^\(libdir=\$\){prefix}|\1{exec_prefix}|' "$_PREFIX/lib/pkgconfig/libglog.pc"
+  sed -i '' "s|=$_PREFIX/|=\${prefix}/|" "$_PREFIX/lib/pkgconfig/libglog.pc"
 fi
