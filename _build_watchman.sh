@@ -2,7 +2,7 @@
 set -xe
 _SC_DIR="$(cd "`dirname "$0"`"; pwd)"
 
-_PKG=watchman-2021.02.15.00
+_PKG=watchman-2022.05.16.00
 _PREFIX="$1"
 _SCRATCH_DIR="$2"
 _EXTRA_ARGS="$3"

@@ -18,15 +18,15 @@ export SDKROOT=/Library/Developer/CommandLineTools/SDKs/MacOSX10.14.sdk
 
 ```bash
 # Use the stable release
-git clone --depth=1 -b v2021_02_15 https://github.com/thachnn/watchman-builder.git
+git clone --depth=1 -b v2022_05_16 https://github.com/thachnn/watchman-builder.git
 cd watchman-builder
 
 ./build.sh --prefix=/opt/local --scratch-path=/usr/local/src \
   --without-python --state-dir=/usr/local/var/run/watchman --with-os-libs
 
 # Pack the built
-cd /opt/local && zip -r ~/watchman-2021.02.15-macos.zip bin/watchman*
-cd /usr/local && zip -ru ~/watchman-2021.02.15-macos.zip var/run/watchman*
+cd /opt/local && zip -r ~/watchman-2022.05.16-macos.zip bin/watchman*
+cd /usr/local && zip -ru ~/watchman-2022.05.16-macos.zip var/run/watchman*
 ```
 
 ## Note
