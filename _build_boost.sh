@@ -1,7 +1,7 @@
 #!/bin/bash
 set -xe
 
-_PKG=boost_1_69_0
+_PKG=boost_1_78_0
 _PREFIX="$1"
 _SCRATCH_DIR="$2"
 _LIBRARIES="$3"
@@ -10,7 +10,7 @@ _LIBRARIES="$3"
 if [[ ! -e "$_PREFIX/include/boost" ]]
 then
   cd "$_SCRATCH_DIR"
-  while ! shasum -cs <<< "8f32d4617390d1c2d16f26a27ab60d97807b35440d45891fa340fc2648b04406 *$_PKG.tar.bz2"
+  while ! shasum -cs <<< "8681f175d4bdb26c52222665793eef08490d7758529330f98d3b29dd0735bccc *$_PKG.tar.bz2"
   do
     curl -OkfSL "https://boostorg.jfrog.io/artifactory/main/release/$(tr _ . <<< "${_PKG:6}")/source/$_PKG.tar.bz2"
   done
@@ -23,7 +23,7 @@ then
   ./bootstrap.sh "--prefix=$_PREFIX" "--with-icu=$_PREFIX" "--with-libraries=$_LIBRARIES"
 
   # Fix slow headers copying
-  rsync -aW --exclude='*.'{cpp,pl,erb,re,txt,patch,m4,bat,sh,dtd} boost "$_PREFIX/include"
+  rsync -aW --exclude='*.'{cpp,pl,py,erb,re,txt,patch,m4,bat,sh,dtd,natvis} boost "$_PREFIX/include"
 
   # Clang compiler may need `cxxflags=-stdlib=libc++ linkflags=-stdlib=libc++`
   ./b2 -d2 -j2 --user-config=user-config.jam variant=release cxxflags=-std=c++14 install \

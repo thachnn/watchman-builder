@@ -9,10 +9,10 @@ then
   if [[ ! -x "$_PREFIX/bin/cmake" ]]
   then
   (
-    _PKG=cmake-3.18.6-Darwin-x86_64
+    _PKG=cmake-3.21.6-macos10.10-universal
 
     cd "$_SCRATCH_DIR"
-    while ! shasum -cs <<< "676dc3f1d6f15cd7c1d9f4fa7e2a43613f426cd20783c02d4fdb5e139f39eec3 *$_PKG.tar.gz"
+    while ! shasum -cs <<< "6451134d0ded2a5c7bf403d90888b3254c6e9a9db72b8f393eca2012d7da6a1a *$_PKG.tar.gz"
     do
       curl -OkfSL "https://github.com/Kitware/CMake/releases/download/v${_PKG:6:6}/$_PKG.tar.gz"
     done

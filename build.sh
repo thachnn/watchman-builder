@@ -48,6 +48,7 @@ done
 "$_SC_DIR/_build_pcre.sh" "$_PREFIX" "$_SCRATCH_DIR"
 "$_SC_DIR/_build_openssl.sh" "$_PREFIX" "$_SCRATCH_DIR"
 "$_SC_DIR/_build_gflags.sh" "$_PREFIX" "$_SCRATCH_DIR"
+[[ "$_WITH_OS_LIBS" != 1 ]] || "$_SC_DIR/__build_libunwind.sh" "$_PREFIX" "$_SCRATCH_DIR"
 "$_SC_DIR/_build_glog.sh" "$_PREFIX" "$_SCRATCH_DIR"
 "$_SC_DIR/_build_libevent.sh" "$_PREFIX" "$_SCRATCH_DIR"
 "$_SC_DIR/_build_fmt.sh" "$_PREFIX" "$_SCRATCH_DIR"
@@ -68,7 +69,7 @@ done
 "$_SC_DIR/__build_snappy.sh" "$_PREFIX" "$_SCRATCH_DIR"
 # NOTE: LibDwarf LibIberty LibAIO LibUring ?
 "$_SC_DIR/__build_libsodium.sh" "$_PREFIX" "$_SCRATCH_DIR"
-[[ "$_WITH_OS_LIBS" != 1 ]] || "$_SC_DIR/__build_libunwind.sh" "$_PREFIX" "$_SCRATCH_DIR"
+# LibUnwind
 "$_SC_DIR/_build_folly.sh" "$_PREFIX" "$_SCRATCH_DIR" "$_NO_TESTS"
 
 

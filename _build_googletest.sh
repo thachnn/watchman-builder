@@ -1,7 +1,7 @@
 #!/bin/bash
 set -xe
 
-_PKG=googletest-release-1.10.0
+_PKG=googletest-release-1.11.0
 _PREFIX="$1"
 _SCRATCH_DIR="$2"
 
@@ -14,9 +14,6 @@ then
   tar -xf "$_PKG.tgz"
 
   cd "$_PKG"
-  # Patch .pc.in files
-  sed -i- 's/^prefix=\$.*/prefix=@CMAKE_INSTALL_PREFIX@/' */cmake/*.pc.in
-
   cmake . -DCMAKE_BUILD_TYPE=Release -DCMAKE_FIND_FRAMEWORK=LAST \
     -DCMAKE_VERBOSE_MAKEFILE=ON -Wno-dev "-DCMAKE_INSTALL_PREFIX=$_PREFIX"
 

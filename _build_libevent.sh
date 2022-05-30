@@ -1,7 +1,7 @@
 #!/bin/bash
 set -xe
 
-_PKG=libevent-2.1.8-stable
+_PKG=libevent-2.1.12-stable
 _PREFIX="$1"
 _SCRATCH_DIR="$2"
 

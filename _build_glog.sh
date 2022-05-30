@@ -1,7 +1,7 @@
 #!/bin/bash
 set -xe
 
-_PKG=glog-0.4.0
+_PKG=glog-0.5.0
 _PREFIX="$1"
 _SCRATCH_DIR="$2"
 
@@ -16,16 +16,15 @@ then
 
   cd "$_PKG"
   cmake . -DCMAKE_BUILD_TYPE=Release -DCMAKE_FIND_FRAMEWORK=LAST \
-    -DCMAKE_VERBOSE_MAKEFILE=ON -Wno-dev -DCMAKE_EXPORT_NO_PACKAGE_REGISTRY=ON \
-    -DBUILD_TESTING=OFF "-DCMAKE_INSTALL_PREFIX=$_PREFIX" "-DCMAKE_PREFIX_PATH=$_PREFIX"
+    -DCMAKE_VERBOSE_MAKEFILE=ON -Wno-dev -DBUILD_TESTING=OFF -DBUILD_SHARED_LIBS=OFF \
+    "-DCMAKE_INSTALL_PREFIX=$_PREFIX" "-DCMAKE_PREFIX_PATH=$_PREFIX" \
+    -DWITH_GTEST=OFF -DWITH_PKGCONFIG=ON -DCMAKE_EXPORT_NO_PACKAGE_REGISTRY=ON
 
   # Use relative paths
   find CMakeFiles -name build.make -exec sed -i- "s:-c $PWD/:-c :" {} +
   make -j2 install
 
-  # Missing files
-  mkdir -p "$_PREFIX/lib/pkgconfig"
-  sed -e "s:@prefix@:$_PREFIX:" -e 's,@includedir@,${prefix}/include,' \
-    -e 's/@exec_prefix@/${prefix}/' -e 's,@libdir@,${exec_prefix}/lib,' \
-    -e "s/@VERSION@/${_PKG#*-}/" libglog.pc.in > "$_PREFIX/lib/pkgconfig/libglog.pc"
+  # Correct .pc file
+  sed -i '' -e "s|=$_PREFIX|=\${prefix}|" -e "s|^prefix=\\\$.*|prefix=$_PREFIX|" \
+    -e 's|^\(libdir=\$\){prefix}|\1{exec_prefix}|' "$_PREFIX/lib/pkgconfig/libglog.pc"
 fi
