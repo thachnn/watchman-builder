@@ -22,7 +22,6 @@ then
   make install
 
   # Correct the generated .pc file
-  sed -i '' -e "s:^libdir=$_PREFIX/:libdir=\${exec_prefix}/:" \
-    -e "s:^includedir=$_PREFIX/:includedir=\${prefix}/:" \
-    -e 's/^\(exec_prefix=\).*/\1${prefix}/' "$_PREFIX/lib/pkgconfig/liblzma.pc"
+  sed -i '' -e "s:=$_PREFIX:=\${prefix}:;s:^prefix=\\\$.*:prefix=$_PREFIX:" \
+    -e 's/^libdir=\${prefix}/libdir=${exec_prefix}/' "$_PREFIX/lib/pkgconfig/liblzma.pc"
 fi

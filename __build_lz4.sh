@@ -17,8 +17,6 @@ then
   make -j2 V=1 install BUILD_SHARED=no "PREFIX=$_PREFIX"
 
   # Correct the generated .pc file
-  sed -i '' -e "s:^libdir=$_PREFIX/:libdir=\${prefix}/:" \
-    -e "s:^includedir=$_PREFIX/:includedir=\${prefix}/:" \
-    -e 's/^\(Libs: -L\).* -l/\1${libdir} -l/' \
-    -e 's/^\(Cflags: -I\).*/\1${includedir}/' "$_PREFIX/lib/pkgconfig/liblz4.pc"
+  sed -i '' -e "s:=$_PREFIX/:=\${prefix}/:" -e "s:-L$_PREFIX/lib:-L\${libdir}:" \
+    -e "s:-I$_PREFIX/include:-I\${includedir}:" "$_PREFIX/lib/pkgconfig/liblz4.pc"
 fi
