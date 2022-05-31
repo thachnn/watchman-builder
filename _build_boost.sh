@@ -15,7 +15,7 @@ then
     curl -OkfSL "https://boostorg.jfrog.io/artifactory/main/release/$(tr _ . <<< "${_PKG:6}")/source/$_PKG.tar.bz2"
   done
   rm -rf "$_PKG"
-  tar -xf "$_PKG.tar.bz2"
+  (set +x; while true; do sleep 2; printf .; done) & tar -xf "$_PKG.tar.bz2" && kill $!
 
   cd "$_PKG"
   # Disable debugging symbols
