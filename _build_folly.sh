@@ -11,8 +11,6 @@ _NO_TESTS="$3"
 #            (LibDwarf LibIberty LibAIO LibUring)? Libsodium LibUnwind fmt, GoogleTest
 if [[ ! -e "$_PREFIX/lib/cmake/folly" ]]
 then
-  . "$_SC_DIR/__install_libcxx-headers.sh"
-
   cd "$_SCRATCH_DIR"
   [[ -s "$_PKG.tgz" ]] || \
     curl -o "$_PKG.tgz" -kfSL "https://github.com/facebook/folly/archive/v${_PKG#*-}.tar.gz"
@@ -29,7 +27,7 @@ then
   cmake . -DCMAKE_BUILD_TYPE=Release -DCMAKE_FIND_FRAMEWORK=LAST \
     -DCMAKE_VERBOSE_MAKEFILE=ON -Wno-dev "-DBUILD_TESTS=$_BUILD_TESTS" \
     "-DCMAKE_INSTALL_PREFIX=$_PREFIX" "-DCMAKE_PREFIX_PATH=$_PREFIX" \
-    -DFOLLY_CXX_FLAGS=-Wno-unusable-partial-specialization
+    -DBOOST_LINK_STATIC=ON -DFOLLY_CXX_FLAGS=-Wno-unusable-partial-specialization
   # -DBUILD_SHARED_LIBS=OFF -DFOLLY_USE_JEMALLOC=OFF
 
   # Use relative paths

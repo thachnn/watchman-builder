@@ -7,7 +7,9 @@ set -xe
 
 # Check missing C++17 headers
 _TMPCXX_="$(mktemp -ut cxx17test).cxx"
-echo '#include <variant>' > "$_TMPCXX_"
+echo '#include <variant>
+#include <optional>
+int main() { std::variant<int> v; std::optional<int> o(0); return 0; }' > "$_TMPCXX_"
 
 _TMPCXX_="-D_GNU_SOURCE -std=gnu++1z -I$_PREFIX/include -o $_TMPCXX_.o -c $_TMPCXX_"
 [[ -z "$SDKROOT" ]] || _TMPCXX_="-isysroot $SDKROOT $_TMPCXX_"
@@ -34,7 +36,14 @@ then
     -e 's/__enable_hash_helper<\([^,]*\), [^ ,]*\.>/\1/g' \
     -e 's/__is_inplace_index</__is_inplace_type</g' "$_PREFIX/include/variant"
 
-  ${CXX:-clang++} $_TMPCXX_ > /dev/null
+  if ! ${CXX:-clang++} $_TMPCXX_ &> /dev/null
+  then
+    echo '#pragma once
+#include <experimental/optional>
+namespace std { using namespace experimental; }' > "$_PREFIX/include/optional"
+
+    ${CXX:-clang++} $_TMPCXX_ > /dev/null
+  fi
 )
 fi
 

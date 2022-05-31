@@ -1,7 +1,7 @@
 #!/bin/bash
 set -xe
 
-_PKG=zstd-1.4.5
+_PKG=zstd-1.4.9
 _PREFIX="$1"
 _SCRATCH_DIR="$2"
 
@@ -15,4 +15,8 @@ then
 
   cd "$_PKG/lib"
   make -j2 V=1 install-static install-includes install-pc "PREFIX=$_PREFIX"
+
+  # Correct .pc file
+  sed -i '' -e "s:=$_PREFIX:=\${prefix}:;s:^prefix=\\\$.*:prefix=$_PREFIX:" \
+    -e 's/^libdir=\${prefix}/libdir=${exec_prefix}/' "$_PREFIX/lib/pkgconfig/libzstd.pc"
 fi

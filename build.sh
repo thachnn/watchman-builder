@@ -68,8 +68,9 @@ done
 "$_SC_DIR/__build_zstd.sh" "$_PREFIX" "$_SCRATCH_DIR"
 "$_SC_DIR/__build_snappy.sh" "$_PREFIX" "$_SCRATCH_DIR"
 # NOTE: LibDwarf LibIberty LibAIO LibUring ?
-"$_SC_DIR/__build_libsodium.sh" "$_PREFIX" "$_SCRATCH_DIR"
+"$_SC_DIR/__build_libsodium.sh" "$_PREFIX" "$_SCRATCH_DIR" "$_NO_TESTS"
 # LibUnwind
+"$_SC_DIR/__install_libcxx-headers.sh" "$_PREFIX" "$_SCRATCH_DIR"
 "$_SC_DIR/_build_folly.sh" "$_PREFIX" "$_SCRATCH_DIR" "$_NO_TESTS"
 
 
