@@ -23,8 +23,8 @@ then
   make -j2 install_dev install_engines
 
   if [[ "$_NO_TESTS" == 0 ]]; then
-    curl -skfSL 'https://github.com/openssl/openssl/commit/{' \
-      '73db5d82489b3ec09ccc772dfcee14fef0e8e908,b7ce611887cfac633aacc052b2e71a7f195418b8}.patch' | patch -p1
+    curl -skfSL 'https://github.com/openssl/openssl/commit/{'\
+'73db5d82489b3ec09ccc772dfcee14fef0e8e908,b7ce611887cfac633aacc052b2e71a7f195418b8}.patch' | patch -p1
     make test
   fi
 fi
