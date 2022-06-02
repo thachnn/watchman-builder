@@ -16,6 +16,7 @@ _TMPCXX_="-D_GNU_SOURCE -std=gnu++1z -I$_PREFIX/include -o $_TMPCXX_.o -c $_TMPC
 
 if ! "$CXX" $_TMPCXX_ &> /dev/null
 then
+  mkdir -p "$_PREFIX/include"
   # C++17 std::variant patching...
   curl -kfSL https://github.com/apple/swift-libcxx/raw/swift-5.0-RELEASE/include/variant \
     | sed -e 's/^\(#include <__undef\)_macros>/\1_min_max>/' \
@@ -34,6 +35,7 @@ int main() { std::optional<int> v(0); return 0; }' > "${_TMPCXX_#* -c }"
 
 if ! "$CXX" $_TMPCXX_ &> /dev/null
 then
+  mkdir -p "$_PREFIX/include"
   echo '#pragma once
 #include <experimental/optional>
 namespace std { using namespace experimental; }' > "$_PREFIX/include/optional"

@@ -21,7 +21,7 @@ then
 
   # Use relative paths
   find CMakeFiles -name build.make -exec sed -i- "s:-c $PWD/:-c :" {} +
-
   make -j2 install
+
   [[ "$_NO_TESTS" != 0 ]] || make test
 fi
