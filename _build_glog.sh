@@ -16,6 +16,10 @@ then
   tar -xf "$_PKG.tgz"
 
   cd "$_PKG"
+  # Patch tests
+  [[ "$_NO_TESTS" != 0 ]] || curl -skfSL \
+    'https://github.com/google/glog/commit/15d51a17cc84c6e16f76da3697769afa859a8f7d.patch' | patch -p1
+
   cmake . -DCMAKE_BUILD_TYPE=Release -DCMAKE_FIND_FRAMEWORK=LAST \
     -DCMAKE_VERBOSE_MAKEFILE=ON -Wno-dev "-DCMAKE_INSTALL_PREFIX=$_PREFIX" \
     "-DCMAKE_PREFIX_PATH=$_PREFIX" -DCMAKE_EXPORT_NO_PACKAGE_REGISTRY=ON \

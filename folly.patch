@@ -1,5 +1,5 @@
 diff --git a/CMake/FollyCompilerUnix.cmake b/CMake/FollyCompilerUnix.cmake
-index 8dcaf141a..ecb252a95 100644
+index 8dcaf14..ecb252a 100644
 --- a/CMake/FollyCompilerUnix.cmake
 +++ b/CMake/FollyCompilerUnix.cmake
 @@ -28,7 +28,7 @@ set(
@@ -20,7 +20,7 @@ index 8dcaf141a..ecb252a95 100644
        -finput-charset=UTF-8
        -fsigned-char
 diff --git a/CMake/folly-deps.cmake b/CMake/folly-deps.cmake
-index a0479e6db..f404f83eb 100644
+index a0479e6..f404f83 100644
 --- a/CMake/folly-deps.cmake
 +++ b/CMake/folly-deps.cmake
 @@ -70,6 +70,9 @@ find_package(LibEvent MODULE REQUIRED)
@@ -43,7 +43,7 @@ index a0479e6db..f404f83eb 100644
  set(FOLLY_HAVE_LIBLZ4 ${LZ4_FOUND})
  if (LZ4_FOUND)
 diff --git a/CMake/libfolly.pc.in b/CMake/libfolly.pc.in
-index ffa043c1f..039a10242 100644
+index ffa043c..039a102 100644
 --- a/CMake/libfolly.pc.in
 +++ b/CMake/libfolly.pc.in
 @@ -1,5 +1,5 @@
@@ -54,7 +54,7 @@ index ffa043c1f..039a10242 100644
  includedir=${prefix}/@CMAKE_INSTALL_INCLUDEDIR@
  
 diff --git a/folly/io/async/test/EventBaseTestLib.h b/folly/io/async/test/EventBaseTestLib.h
-index da2484490..4b99f6080 100644
+index da24844..4b99f60 100644
 --- a/folly/io/async/test/EventBaseTestLib.h
 +++ b/folly/io/async/test/EventBaseTestLib.h
 @@ -2235,7 +2235,7 @@ TYPED_TEST_P(EventBaseTest1, DrivableExecutorTest) {
@@ -67,7 +67,7 @@ index da2484490..4b99f6080 100644
    std::thread t([&] {
      baton.wait();
 diff --git a/folly/test/MemoryTest.cpp b/folly/test/MemoryTest.cpp
-index f2f3c0a5d..c26d3ece9 100644
+index f2f3c0a..c26d3ec 100644
 --- a/folly/test/MemoryTest.cpp
 +++ b/folly/test/MemoryTest.cpp
 @@ -87,7 +87,7 @@ TEST(make_unique, compatible_with_std_make_unique) {
@@ -80,7 +80,7 @@ index f2f3c0a5d..c26d3ece9 100644
    EXPECT_EQ(4, *a);
  }
 diff --git a/folly/test/TraitsTest.cpp b/folly/test/TraitsTest.cpp
-index fd6e6d63e..f4356771d 100644
+index fd6e6d6..f435677 100644
 --- a/folly/test/TraitsTest.cpp
 +++ b/folly/test/TraitsTest.cpp
 @@ -109,8 +109,10 @@ TEST(Traits, conditional) {

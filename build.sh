@@ -49,7 +49,7 @@ done
 "$_SC_DIR/_build_openssl.sh" "$_PREFIX" "$_SCRATCH_DIR" "$_NO_TESTS"
 "$_SC_DIR/_build_gflags.sh" "$_PREFIX" "$_SCRATCH_DIR" "$_NO_TESTS"
 "$_SC_DIR/_build_glog.sh" "$_PREFIX" "$_SCRATCH_DIR" "$_NO_TESTS"
-"$_SC_DIR/_build_libevent.sh" "$_PREFIX" "$_SCRATCH_DIR"
+"$_SC_DIR/_build_libevent.sh" "$_PREFIX" "$_SCRATCH_DIR" "$_NO_TESTS"
 "$_SC_DIR/_build_fmt.sh" "$_PREFIX" "$_SCRATCH_DIR"
 
 # Boost
