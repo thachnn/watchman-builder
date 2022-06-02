@@ -1,7 +1,8 @@
 #!/bin/bash
 set -xe
 
-_PKG=boost_1_69_0
+_VER=1_69_0
+_PKG="boost_$_VER"
 _PREFIX="$1"
 _SCRATCH_DIR="$2"
 _LIBRARIES="$3"
@@ -12,7 +13,7 @@ then
   cd "$_SCRATCH_DIR"
   while ! shasum -cs <<< "8f32d4617390d1c2d16f26a27ab60d97807b35440d45891fa340fc2648b04406 *$_PKG.tar.bz2"
   do
-    curl -OkfSL "https://boostorg.jfrog.io/artifactory/main/release/$(tr _ . <<< "${_PKG:6}")/source/$_PKG.tar.bz2"
+    curl -OkfSL "https://boostorg.jfrog.io/artifactory/main/release/${_VER//_/.}/source/$_PKG.tar.bz2"
   done
   rm -rf "$_PKG"
   (set +x; while true; do sleep 2; printf .; done) & tar -xf "$_PKG.tar.bz2" && kill $!
