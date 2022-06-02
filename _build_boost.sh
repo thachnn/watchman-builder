@@ -5,7 +5,8 @@ _VER=1_69_0
 _PKG="boost_$_VER"
 _PREFIX="$1"
 _SCRATCH_DIR="$2"
-_LIBRARIES="$3"
+_NO_TESTS="$3"
+_LIBRARIES="$4"
 
 # Depends on: ICU (lzma zstd: iostreams)
 if [[ ! -e "$_PREFIX/include/boost" ]]
@@ -29,4 +30,10 @@ then
   # Clang compiler may need `cxxflags=-stdlib=libc++ linkflags=-stdlib=libc++`
   ./b2 -d2 -j2 --user-config=user-config.jam variant=release cxxflags=-std=c++14 install \
     threading=multi link=static "include=$_PREFIX/include" "library-path=$_PREFIX/lib"
+
+  if [[ "$_NO_TESTS" == 0 ]]; then
+    for i in ${_LIBRARIES//,/ }; do
+      (cd "libs/$i/test"; ../../../b2)
+    done
+  fi
 fi

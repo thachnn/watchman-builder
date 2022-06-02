@@ -53,8 +53,8 @@ done
 "$_SC_DIR/_build_fmt.sh" "$_PREFIX" "$_SCRATCH_DIR" "$_NO_TESTS"
 
 # Boost
-"$_SC_DIR/__build_icu4c.sh" "$_PREFIX" "$_SCRATCH_DIR"
-"$_SC_DIR/_build_boost.sh" "$_PREFIX" "$_SCRATCH_DIR" \
+"$_SC_DIR/__build_icu4c.sh" "$_PREFIX" "$_SCRATCH_DIR" "$_NO_TESTS"
+"$_SC_DIR/_build_boost.sh" "$_PREFIX" "$_SCRATCH_DIR" "$_NO_TESTS" \
   'regex,thread,date_time,filesystem,system,chrono,context,atomic,program_options'
 
 # GoogleTest
