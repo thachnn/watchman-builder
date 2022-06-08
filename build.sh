@@ -58,17 +58,20 @@ done
   'regex,thread,date_time,filesystem,system,chrono,context,atomic,program_options'
 
 # GoogleTest
-[[ "$_NO_TESTS" != 0 ]] || "$_SC_DIR/_build_googletest.sh" "$_PREFIX" "$_SCRATCH_DIR"
+[[ "$_NO_TESTS" != 0 ]] || \
+  "$_SC_DIR/_build_googletest.sh" "$_PREFIX" "$_SCRATCH_DIR" "$_NO_TESTS"
 
 # Folly
-"$_SC_DIR/__build_double-conversion.sh" "$_PREFIX" "$_SCRATCH_DIR"
-[[ "$_WITH_OS_LIBS" != 1 ]] || "$_SC_DIR/__build_lzma.sh" "$_PREFIX" "$_SCRATCH_DIR"
-"$_SC_DIR/__build_lz4.sh" "$_PREFIX" "$_SCRATCH_DIR"
-"$_SC_DIR/__build_zstd.sh" "$_PREFIX" "$_SCRATCH_DIR"
-"$_SC_DIR/__build_snappy.sh" "$_PREFIX" "$_SCRATCH_DIR"
+"$_SC_DIR/__build_double-conversion.sh" "$_PREFIX" "$_SCRATCH_DIR" "$_NO_TESTS"
+[[ "$_WITH_OS_LIBS" != 1 ]] || \
+  "$_SC_DIR/__build_lzma.sh" "$_PREFIX" "$_SCRATCH_DIR" "$_NO_TESTS"
+"$_SC_DIR/__build_lz4.sh" "$_PREFIX" "$_SCRATCH_DIR" "$_NO_TESTS"
+"$_SC_DIR/__build_zstd.sh" "$_PREFIX" "$_SCRATCH_DIR" "$_NO_TESTS"
+"$_SC_DIR/__build_snappy.sh" "$_PREFIX" "$_SCRATCH_DIR" "$_NO_TESTS"
 # NOTE: LibDwarf LibIberty LibAIO LibUring ?
-"$_SC_DIR/__build_libsodium.sh" "$_PREFIX" "$_SCRATCH_DIR"
-[[ "$_WITH_OS_LIBS" != 1 ]] || "$_SC_DIR/__build_libunwind.sh" "$_PREFIX" "$_SCRATCH_DIR"
+"$_SC_DIR/__build_libsodium.sh" "$_PREFIX" "$_SCRATCH_DIR" "$_NO_TESTS"
+[[ "$_WITH_OS_LIBS" != 1 ]] || \
+  "$_SC_DIR/__build_libunwind.sh" "$_PREFIX" "$_SCRATCH_DIR" "$_NO_TESTS"
 "$_SC_DIR/_build_folly.sh" "$_PREFIX" "$_SCRATCH_DIR" "$_NO_TESTS"
 
 

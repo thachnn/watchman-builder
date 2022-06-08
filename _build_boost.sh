@@ -17,7 +17,7 @@ then
     curl -OkfSL "https://boostorg.jfrog.io/artifactory/main/release/${_VER//_/.}/source/$_PKG.tar.bz2"
   done
   rm -rf "$_PKG"
-  (set +x; while true; do sleep 2; printf .; done) & tar -xf "$_PKG.tar.bz2" && kill $!
+  (set +x; while true; do sleep 2; printf .; done) & tar -xf "$_PKG.tar.bz2" && kill -9 $!
 
   cd "$_PKG"
   # Disable debugging symbols
@@ -32,8 +32,9 @@ then
     threading=multi link=static "include=$_PREFIX/include" "library-path=$_PREFIX/lib"
 
   if [[ "$_NO_TESTS" == 0 ]]; then
-    for i in ${_LIBRARIES//,/ }; do
-      (cd "libs/$i/test"; ../../../b2)
-    done
+    cd status
+    ../b2 -d2 -q --user-config=../user-config.jam variant=release cxxflags=-std=c++14 \
+      threading=multi link=static "include=$_PREFIX/include" "library-path=$_PREFIX/lib" \
+      --check-libs-only "--include-tests=$_LIBRARIES"
   fi
 fi
