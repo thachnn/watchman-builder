@@ -31,8 +31,8 @@ then
   # -DFOLLY_USE_JEMALLOC=OFF
 
   # Use relative paths
-  find CMakeFiles -name build.make -exec sed -i- "s:-c $PWD/:-c :" {} +
-  find CMakeFiles -name flags.make -exec sed -i- "s:-I$PWD:-I.:g" {} +
+  find CMakeFiles -name flags.make -exec sed -i- "s:-I$PWD:-I.:g" {} + \
+    -o -name build.make -exec sed -i- "s:-c $PWD/:-c :" {} +
   find */CMakeFiles -name build.make -exec sed -i- "s:-c $PWD/[^ /]*/:-c :" {} +
 
   make -j2 install
