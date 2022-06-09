@@ -1,5 +1,6 @@
 #!/bin/bash
 set -xe
+_SC_DIR="$(cd "`dirname "$0"`"; pwd)"
 
 _VER=1_69_0
 _PKG="boost_$_VER"
@@ -17,9 +18,12 @@ then
     curl -OkfSL "https://boostorg.jfrog.io/artifactory/main/release/${_VER//_/.}/source/$_PKG.tar.bz2"
   done
   rm -rf "$_PKG"
-  (set +x; while true; do sleep 2; printf .; done) & tar -xf "$_PKG.tar.bz2" && kill -9 $!
+  (set +x; while sleep 2; do echo -n .; done) & tar -xf "$_PKG.tar.bz2" && kill -9 $!
 
   cd "$_PKG"
+  # Patch tests
+  patch -p1 -i "$_SC_DIR/boost.patch"
+
   # Disable debugging symbols
   echo "using darwin : : ${CXX} : <compileflags>-g0 ;" > user-config.jam
   ./bootstrap.sh "--prefix=$_PREFIX" "--with-icu=$_PREFIX" "--with-libraries=$_LIBRARIES"
@@ -33,8 +37,7 @@ then
 
   if [[ "$_NO_TESTS" == 0 ]]; then
     cd status
-    ../b2 -d2 -q --user-config=../user-config.jam variant=release cxxflags=-std=c++14 \
-      threading=multi link=static "include=$_PREFIX/include" "library-path=$_PREFIX/lib" \
-      --check-libs-only "--include-tests=$_LIBRARIES"
+    ../b2 -j2 -q "--include-tests=$_LIBRARIES" --user-config=../user-config.jam variant=release \
+      cxxflags=-std=c++14 threading=multi link=static "include=$_PREFIX/include" "library-path=$_PREFIX/lib"
   fi
 fi
