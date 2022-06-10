@@ -16,6 +16,11 @@ then
   tar -xf "$_PKG.tgz"
 
   cd "$_PKG"
+  # Patch tests
+  sed -i- -e 's/(GTest QUIET)/(GTest)/;s/(Gflags QUIET)/(gflags)/' \
+    -e 's/GFLAGS_FOUND/gflags_FOUND/;s/\(GFLAGS_INCLUDE_DIR\)S/\1/' \
+    -e 's/\${GFLAGS_LIBRARIES}/${GTEST_LIBRARIES} &/' CMakeLists.txt
+
   cmake . -DCMAKE_BUILD_TYPE=Release -DCMAKE_FIND_FRAMEWORK=LAST \
     -DCMAKE_VERBOSE_MAKEFILE=ON -Wno-dev "-DCMAKE_INSTALL_PREFIX=$_PREFIX" \
     "-DCMAKE_PREFIX_PATH=$_PREFIX" -DBUILD_SHARED_LIBS=OFF \
