@@ -4,6 +4,7 @@ set -xe
 _PKG=zstd-1.4.5
 _PREFIX="$1"
 _SCRATCH_DIR="$2"
+_NO_TESTS="$3"
 
 if [[ ! -e "$_PREFIX/include/zstd.h" ]]
 then
@@ -14,5 +15,18 @@ then
   tar -xf "$_PKG.tar.gz"
 
   cd "$_PKG/lib"
-  make -j2 V=1 install-static install-includes install-pc "PREFIX=$_PREFIX"
+  make -j2 V=1 install-static-mt install-includes install-pc "PREFIX=$_PREFIX"
+
+  if [[ "$_NO_TESTS" == 0 ]]; then
+    cd ../tests
+    for i in common=m compress=c decompress=d legacy=l; do
+      for f in "../lib/${i%=*}"/*.o; do
+        for k in mt_ ''; do ln -s "$f" "./zstd$k${i#*=}_$(basename "$f")"; done
+      done
+    done
+
+    make -j2 test-fuzzer test-zstream test-invalidDictionaries test-decodecorpus DEBUGLEVEL=0 \
+      "MOREFLAGS=-DXXH_NAMESPACE=ZSTD_ -DZSTD_LEGACY_SUPPORT=4 $(echo zstdmt_l_*.o)"
+    make -j2 test-legacy DEBUGLEVEL=0 MOREFLAGS=-DXXH_NAMESPACE=ZSTD_
+  fi
 fi
