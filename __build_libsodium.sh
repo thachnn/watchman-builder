@@ -5,6 +5,7 @@ _PKG=libsodium-1.0.17-stable
 _DIR="${_PKG%%-*}-${_PKG##*-}"
 _PREFIX="$1"
 _SCRATCH_DIR="$2"
+_NO_TESTS="$3"
 
 if [[ ! -e "$_PREFIX/lib/libsodium.a" ]]
 then
@@ -20,4 +21,6 @@ then
 
   make -j2 V=1
   make install
+
+  [[ "$_NO_TESTS" != 0 ]] || make check
 fi
