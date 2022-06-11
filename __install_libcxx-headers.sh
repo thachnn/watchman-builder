@@ -2,7 +2,6 @@
 set -xe
 
 : "${_PREFIX:=$1}"
-: "${CXX:=clang++}"
 
 # Check missing C++17 headers
 _TMPCXX_="$(mktemp -ut cxx17test).cxx"
@@ -14,7 +13,7 @@ _TMPCXX_="-D_GNU_SOURCE -std=gnu++1z -I$_PREFIX/include -o $_TMPCXX_.o -c $_TMPC
 [[ -z "$MACOSX_DEPLOYMENT_TARGET" ]] || \
   _TMPCXX_="-mmacosx-version-min=$MACOSX_DEPLOYMENT_TARGET $_TMPCXX_"
 
-if ! "$CXX" $_TMPCXX_ &> /dev/null
+if ! ${CXX:-clang++} $_TMPCXX_ &> /dev/null
 then
   mkdir -p "$_PREFIX/include"
   # C++17 std::variant patching...
@@ -26,21 +25,21 @@ then
       -e '/^ *enable_if_t<!__is_inplace_index<.*> = 0,$/d' \
     > "$_PREFIX/include/variant"
 
-  "$CXX" $_TMPCXX_ > /dev/null
+  ${CXX:-clang++} $_TMPCXX_ > /dev/null
 fi
 
 # C++17 std::optional patching...
 echo '#include <optional>
 int main() { std::optional<int> v(0); return 0; }' > "${_TMPCXX_#* -c }"
 
-if ! "$CXX" $_TMPCXX_ &> /dev/null
+if ! ${CXX:-clang++} $_TMPCXX_ &> /dev/null
 then
   mkdir -p "$_PREFIX/include"
   echo '#pragma once
 #include <experimental/optional>
 namespace std { using namespace experimental; }' > "$_PREFIX/include/optional"
 
-  "$CXX" $_TMPCXX_ > /dev/null
+  ${CXX:-clang++} $_TMPCXX_ > /dev/null
 fi
 
 rm -f "${_TMPCXX_#* -c }"*
