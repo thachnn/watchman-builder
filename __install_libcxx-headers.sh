@@ -1,15 +1,12 @@
 #!/bin/bash
 set -xe
-: "${_SC_DIR:=$(cd "`dirname "$0"`"; pwd)}"
 
 : "${_PREFIX:=$1}"
-: "${_SCRATCH_DIR:=$2}"
 
 # Check missing C++17 headers
 _TMPCXX_="$(mktemp -ut cxx17test).cxx"
 echo '#include <variant>
-#include <optional>
-int main() { std::variant<int> v; std::optional<int> o(0); return 0; }' > "$_TMPCXX_"
+int main() { std::variant<float, int> v(0); return 0; }' > "$_TMPCXX_"
 
 _TMPCXX_="-D_GNU_SOURCE -std=gnu++1z -I$_PREFIX/include -o $_TMPCXX_.o -c $_TMPCXX_"
 [[ -z "$SDKROOT" ]] || _TMPCXX_="-isysroot $SDKROOT $_TMPCXX_"
@@ -18,33 +15,31 @@ _TMPCXX_="-D_GNU_SOURCE -std=gnu++1z -I$_PREFIX/include -o $_TMPCXX_.o -c $_TMPC
 
 if ! ${CXX:-clang++} $_TMPCXX_ &> /dev/null
 then
-(
-  _VER_="$( "$_SC_DIR/get_clang_ver.sh" || echo 9.0.0 )"
-  _PKG_="libcxx-$_VER_.src"
+  mkdir -p "$_PREFIX/include"
+  # C++17 std::variant patching...
+  curl -kfSL https://github.com/apple/swift-libcxx/raw/swift-5.0-RELEASE/include/variant \
+    | sed -e 's/^\(#include <__undef\)_macros>/\1_min_max>/' \
+      -e '/^_LIBCPP_P[H-U]*_MACROS$/d;s/_LIBCPP_INLINE_VAR /inline /' \
+      -e 's/is_invocable_v<\([^ ,]*\), \([^>]*\)>/is_callable_v<\1(\2)>/' \
+      -e 's/__enable_hash_helper<\([^ ,]*\), .*>> /\1> /' \
+      -e '/^ *enable_if_t<!__is_inplace_index<.*> = 0,$/d' \
+    > "$_PREFIX/include/variant"
 
-  cd "$_SCRATCH_DIR"
-  [[ -s "$_PKG_.tar.xz" ]] || "$_SC_DIR/download_llvm_pkg.sh" "$_PKG_" "$_VER_"
-  tar -C "$_PREFIX" -xf "$_PKG_.tar.xz" --strip-components=1 "$_PKG_/include/variant"
+  ${CXX:-clang++} $_TMPCXX_ > /dev/null
+fi
 
-  # Patching...
-  sed -i '' -e '/^#include <version>/d;/^#include <__undef_macros>/d' \
-    -e '/^_LIBCPP_PUSH_MACROS/d;/^_LIBCPP_POP_MACROS/d' \
-    -e 's/\(_LIBCPP_AVAILABILITY_[H-W_]*BAD\)_VARIANT_ACCESS/\1_ANY_CAST/g' \
-    -e 's/_LIBCPP_INLINE_VAR /inline /g;s/_LIBCPP_NODEBUG_TYPE //g' \
-    -e 's/ _If</ conditional_t</g;s/invoke_result_t</__invoke_of</g' \
-    -e 's/is_invocable_v\(<[^>]*>\)/bool_constant<__invokable\1::value>::value/g' \
-    -e 's/__enable_hash_helper<\([^,]*\), [^ ,]*\.>/\1/g' \
-    -e 's/__is_inplace_index</__is_inplace_type</g' "$_PREFIX/include/variant"
+# C++17 std::optional patching...
+echo '#include <optional>
+int main() { std::optional<int> v(0); return 0; }' > "${_TMPCXX_#* -c }"
 
-  if ! ${CXX:-clang++} $_TMPCXX_ &> /dev/null
-  then
-    echo '#pragma once
+if ! ${CXX:-clang++} $_TMPCXX_ &> /dev/null
+then
+  mkdir -p "$_PREFIX/include"
+  echo '#pragma once
 #include <experimental/optional>
 namespace std { using namespace experimental; }' > "$_PREFIX/include/optional"
 
-    ${CXX:-clang++} $_TMPCXX_ > /dev/null
-  fi
-)
+  ${CXX:-clang++} $_TMPCXX_ > /dev/null
 fi
 
 rm -f "${_TMPCXX_#* -c }"*

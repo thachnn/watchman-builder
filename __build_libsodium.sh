@@ -21,5 +21,6 @@ then
 
   make -j2 V=1
   make install
+
   [[ "$_NO_TESTS" != 0 ]] || make check
 fi

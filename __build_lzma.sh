@@ -4,6 +4,7 @@ set -xe
 _PKG=xz-5.2.5
 _PREFIX="$1"
 _SCRATCH_DIR="$2"
+_NO_TESTS="$3"
 
 if [[ ! -e "$_PREFIX/include/lzma.h" ]]
 then
@@ -24,4 +25,6 @@ then
   # Correct the generated .pc file
   sed -i '' -e "s:=$_PREFIX:=\${prefix}:;s:^prefix=\\\$.*:prefix=$_PREFIX:" \
     -e 's/^libdir=\${prefix}/libdir=${exec_prefix}/' "$_PREFIX/lib/pkgconfig/liblzma.pc"
+
+  [[ "$_NO_TESTS" != 0 ]] || make check
 fi

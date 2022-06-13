@@ -18,23 +18,21 @@ then
   tar -xf "$_PKG.tgz"
 
   cd "$_PKG"
-  # Fix package finding issues
+  # Patching...
   patch -p1 -i "$_SC_DIR/folly.patch"
-
   sed -i- 's/:\${CMAKE_BINARY_DIR}//' CMakeLists.txt
-  [[ "$_NO_TESTS" == 0 ]] && _BUILD_TESTS=ON || _BUILD_TESTS=OFF
 
   cmake . -DCMAKE_BUILD_TYPE=Release -DCMAKE_FIND_FRAMEWORK=LAST \
-    -DCMAKE_VERBOSE_MAKEFILE=ON -Wno-dev "-DBUILD_TESTS=$_BUILD_TESTS" \
-    "-DCMAKE_INSTALL_PREFIX=$_PREFIX" "-DCMAKE_PREFIX_PATH=$_PREFIX" \
-    -DBOOST_LINK_STATIC=ON -DFOLLY_CXX_FLAGS=-Wno-unusable-partial-specialization
+    -DCMAKE_VERBOSE_MAKEFILE=ON -Wno-dev "-DCMAKE_INSTALL_PREFIX=$_PREFIX" \
+    "-DCMAKE_PREFIX_PATH=$_PREFIX" -DFOLLY_CXX_FLAGS=-Wno-unusable-partial-specialization \
+    -DBOOST_LINK_STATIC=ON -DBUILD_TESTS=$([[ "$_NO_TESTS" == 0 ]] && echo ON || echo OFF)
   # -DBUILD_SHARED_LIBS=OFF -DFOLLY_USE_JEMALLOC=OFF
 
   # Use relative paths
-  find CMakeFiles -name build.make -exec sed -i- "s:-c $PWD/:-c :" {} +
-  find CMakeFiles -name flags.make -exec sed -i- "s:-I$PWD:-I.:g" {} +
+  find CMakeFiles -name flags.make -exec sed -i- "s:-I$PWD:-I.:g" {} + \
+    -o -name build.make -exec sed -i- "s:-c $PWD/:-c :" {} +
   find */CMakeFiles -name build.make -exec sed -i- "s:-c $PWD/[^ /]*/:-c :" {} +
 
   make -j2 install
-  [[ "$_NO_TESTS" != 0 ]] || make test
+  [[ "$_NO_TESTS" != 0 ]] || make test || true
 fi

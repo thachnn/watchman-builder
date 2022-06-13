@@ -4,6 +4,7 @@ set -xe
 _PKG=googletest-release-1.11.0
 _PREFIX="$1"
 _SCRATCH_DIR="$2"
+_NO_TESTS="$3"
 
 if [[ ! -e "$_PREFIX/lib/cmake/GTest" ]]
 then
@@ -14,16 +15,21 @@ then
   tar -xf "$_PKG.tgz"
 
   cd "$_PKG"
-  # Patch .pc.in files
+  # Optimize .pc files
   sed -i- -e $'s/^libdir=/prefix=@CMAKE_INSTALL_PREFIX@\\\n&/' \
     -e 's|=@CMAKE_INSTALL_FULL_|=${prefix}/@CMAKE_INSTALL_|' */cmake/*.pc.in
 
   cmake . -DCMAKE_BUILD_TYPE=Release -DCMAKE_FIND_FRAMEWORK=LAST \
-    -DCMAKE_VERBOSE_MAKEFILE=ON -Wno-dev "-DCMAKE_INSTALL_PREFIX=$_PREFIX"
+    -DCMAKE_VERBOSE_MAKEFILE=ON -Wno-dev "-DCMAKE_INSTALL_PREFIX=$_PREFIX" \
+    -Dg{mock,test}_build_tests=$([[ "$_NO_TESTS" == 0 ]] && echo ON || echo OFF)
+  # -DBUILD_SHARED_LIBS=OFF
 
   # Use relative paths
-  find */CMakeFiles -name build.make -exec sed -i- "s:-c $PWD/[^ /]*/:-c :" {} +
-  find */CMakeFiles -name flags.make -exec sed -i- "s:$PWD/:../:g" {} +
+  for d in google{mock,test}; do
+    find "$d/CMakeFiles" -name flags.make -exec sed -i- -e "s|$PWD/$d|.|g;s|$PWD/|../|g" {} + \
+      -o -name build.make -exec sed -i- -e "s|-c $PWD/$d/|-c |;s|-c $PWD/|-c ../|" {} +
+  done
 
   make -j2 install
+  [[ "$_NO_TESTS" != 0 ]] || make test
 fi

@@ -4,6 +4,7 @@ set -xe
 _PKG=glog-0.5.0
 _PREFIX="$1"
 _SCRATCH_DIR="$2"
+_NO_TESTS="$3"
 
 # Depends on: gflags
 if [[ ! -e "$_PREFIX/lib/cmake/glog" ]]
@@ -16,15 +17,18 @@ then
 
   cd "$_PKG"
   cmake . -DCMAKE_BUILD_TYPE=Release -DCMAKE_FIND_FRAMEWORK=LAST \
-    -DCMAKE_VERBOSE_MAKEFILE=ON -Wno-dev -DBUILD_TESTING=OFF -DBUILD_SHARED_LIBS=OFF \
-    "-DCMAKE_INSTALL_PREFIX=$_PREFIX" "-DCMAKE_PREFIX_PATH=$_PREFIX" \
-    -DWITH_GTEST=OFF -DWITH_PKGCONFIG=ON -DCMAKE_EXPORT_NO_PACKAGE_REGISTRY=ON
+    -DCMAKE_VERBOSE_MAKEFILE=ON -Wno-dev "-DCMAKE_INSTALL_PREFIX=$_PREFIX" \
+    "-DCMAKE_PREFIX_PATH=$_PREFIX" -DCMAKE_EXPORT_NO_PACKAGE_REGISTRY=ON \
+    -DBUILD_SHARED_LIBS=OFF -DWITH_PKGCONFIG=ON -DWITH_GTEST=OFF \
+    -DBUILD_TESTING=$([[ "$_NO_TESTS" == 0 ]] && echo ON || echo OFF)
 
   # Use relative paths
-  find CMakeFiles -name build.make -exec sed -i- "s:-c $PWD/:-c :" {} +
-  find CMakeFiles -name flags.make -exec sed -i- "s:$PWD/::g" {} +
+  find CMakeFiles -name flags.make -exec sed -i- "s:$PWD/::g" {} + \
+    -o -name build.make -exec sed -i- "s:-c $PWD/:-c :" {} +
 
   make -j2 install
   # Correct .pc file
   sed -i '' "s|=$_PREFIX/|=\${prefix}/|" "$_PREFIX/lib/pkgconfig/libglog.pc"
+
+  [[ "$_NO_TESTS" != 0 ]] || make test || true
 fi

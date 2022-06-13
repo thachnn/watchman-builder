@@ -24,8 +24,8 @@ cmake . -DCMAKE_BUILD_TYPE=Release -DCMAKE_FIND_FRAMEWORK=LAST \
   "-DWATCHMAN_VERSION_OVERRIDE=${_PKG#*-}" "-DWATCHMAN_BUILDINFO_OVERRIDE=$USER"
 
 # Use relative paths
-find CMakeFiles -name build.make -exec sed -i- "s:-c $PWD/:-c :" {} +
-find CMakeFiles -name flags.make -exec sed -i- "s:-I$PWD:-I.:g" {} +
+find CMakeFiles -name flags.make -exec sed -i- "s:-I$PWD:-I.:g" {} + \
+  -o -name build.make -exec sed -i- "s:-c $PWD/:-c :" {} +
 
 make -j2 install
 [[ "$_NO_TESTS" != 0 ]] || make check

@@ -4,6 +4,7 @@ set -xe
 _PKG=pcre-8.45
 _PREFIX="$1"
 _SCRATCH_DIR="$2"
+_NO_TESTS="$3"
 
 if [[ ! -x "$_PREFIX/bin/pcre-config" ]]
 then
@@ -17,8 +18,12 @@ then
     --enable-jit --disable-shared "--prefix=$_PREFIX" CFLAGS=-O2
 
   # Build lib only
-  sed -i- -e 's/^\(PROGRAMS *=\).*/\1/;s/^\(MANS *=\).*/\1/' Makefile
+  sed -i- -e 's/^\(PROGRAMS *=\).*/\1/;s/^\(MANS *=\).*/\1/' \
+    -e 's/ RunTest / /;s/= *RunGrepTest$/=/' Makefile
+
   make -j2 V=1
   make install-binSCRIPTS install-libLTLIBRARIES \
     install-includeHEADERS install-nodist_includeHEADERS install-pkgconfigDATA
+
+  [[ "$_NO_TESTS" != 0 ]] || make check
 fi

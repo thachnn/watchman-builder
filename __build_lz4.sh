@@ -4,6 +4,7 @@ set -xe
 _PKG=lz4-1.8.3
 _PREFIX="$1"
 _SCRATCH_DIR="$2"
+_NO_TESTS="$3"
 
 if [[ ! -e "$_PREFIX/include/lz4.h" ]]
 then
@@ -19,4 +20,8 @@ then
   # Correct the generated .pc file
   sed -i '' -e "s:=$_PREFIX/:=\${prefix}/:" -e "s:-L$_PREFIX/lib:-L\${libdir}:" \
     -e "s:-I$_PREFIX/include:-I\${includedir}:" "$_PREFIX/lib/pkgconfig/liblz4.pc"
+
+  if [[ "$_NO_TESTS" == 0 ]]; then
+    cd ../tests && ln -s ../lib/*.o ./ && make -j2 test-frametest test-fuzzer
+  fi
 fi
