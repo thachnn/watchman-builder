@@ -35,5 +35,5 @@ then
     -e 's,@libdir@,${exec_prefix}/lib,;s,@includedir@,${prefix}/include,' \
     -e "s/@VERSION@/${_PKG#*-}/" libglog.pc.in > "$_PREFIX/lib/pkgconfig/libglog.pc"
 
-  [[ "$_NO_TESTS" != 0 ]] || make test
+  [[ "$_NO_TESTS" != 0 ]] || make test || true
 fi

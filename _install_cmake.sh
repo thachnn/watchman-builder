@@ -19,7 +19,7 @@ then
 
     # Install files
     mkdir -p "$_PREFIX"
-    tar -C "$_PREFIX" -xf "$_PKG.tar.gz" --strip-components=3 "$_PKG/CMake.app/Contents"/{bin,share}
+    tar -C "$_PREFIX" -xf "$_PKG.tar.gz" --strip-components=3 "$_PKG/CMake.app/Contents"/{bin,share} || true
     rm -f "$_PREFIX/bin/cmake-gui"
   )
   fi

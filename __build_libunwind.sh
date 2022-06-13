@@ -24,6 +24,8 @@ then
   cd "$_PKG"
   # Disable tests
   sed -i- $'s/^ *add_subdirectory(test)/if (LLVM_INCLUDE_TESTS)\\\n&\\\nendif()/' CMakeLists.txt
+  sed -i- -e $'s/^include(AddLLVM)/include(FindPythonInterp)\\\nfind_package(Python3)\\\n&/' \
+    -e 's/^set(LIBUNWIND_LIBCXX_PATH [^)]*/& CACHE STRING "libcxx source"/' test/CMakeLists.txt
 
   cmake . -DCMAKE_BUILD_TYPE=Release -DCMAKE_FIND_FRAMEWORK=LAST \
     -DCMAKE_VERBOSE_MAKEFILE=ON -Wno-dev "-DCMAKE_INSTALL_PREFIX=$_PREFIX" \
@@ -40,10 +42,10 @@ then
     cd ..
     _DEP="libcxx-${_PKG#*-}"
     [[ -s "$_DEP.tar.xz" ]] || "$_SC_DIR/download_llvm_pkg.sh" "$_DEP" "$_VER"
-    tar -C "$_PKG" -xf "$_DEP.tar.xz" --strip-components=1 "$_DEP/utils/libcxx" \
-      "$_DEP/test"/{std/input.output/filesystems/Inputs,support/filesystem_dynamic_test_helper.py}
+    tar -C "$_PKG" -xf "$_DEP.tar.xz" --strip-components=1 '--exclude=*.cpp' \
+      "$_DEP/utils"/{libcxx,*.py} "$_DEP/test"/{std/input.output/filesystems,support}
 
     cd "$_PKG"
-    make check-unwind
+    make check-unwind || true
   fi
 fi
