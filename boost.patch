@@ -1,90 +1,47 @@
 diff --git a/libs/date_time/test/Jamfile.v2 b/libs/date_time/test/Jamfile.v2
-index d43444d..150898e 100644
+index 74da9b9..b3e25ce 100644
 --- a/libs/date_time/test/Jamfile.v2
 +++ b/libs/date_time/test/Jamfile.v2
-@@ -1,7 +1,6 @@
- import os ;
+@@ -3,7 +3,6 @@ import path ;
+ import regex ;
  import testing ;
  
 -local DATE_TIME_DYNAMIC_PROPERTIES = <define>BOOST_ALL_DYN_LINK <runtime-link>shared <define>BOOST_DATE_TIME_POSIX_TIME_STD_CONFIG <define>BOOST_ALL_NO_LIB ;
  local DATE_TIME_PROPERTIES = <define>BOOST_DATE_TIME_POSIX_TIME_STD_CONFIG
    # FIXME 
    #std::locale-support 
-@@ -36,24 +35,6 @@ test-suite date_time_core
-    [ run gregorian/testgreg_month.cpp ../build//boost_date_time/<link>static : : : $(DATE_TIME_PROPERTIES) ]
-    [ run gregorian/testgreg_year.cpp ../build//boost_date_time/<link>static : : : $(DATE_TIME_PROPERTIES) ]
-  ;
--test-suite date_time_gregorian_dll
--     : 
--   [ run gregorian/testdate.cpp ../build//boost_date_time : : : $(DATE_TIME_DYNAMIC_PROPERTIES) : testdate_dll ]
--   [ run gregorian/testdate_duration.cpp ../build//boost_date_time : : : $(DATE_TIME_DYNAMIC_PROPERTIES) : testdate_duration_dll ]
--   [ run gregorian/testperiod.cpp ../build//boost_date_time : : : $(DATE_TIME_DYNAMIC_PROPERTIES) : testperiod_dll ]
--   [ run gregorian/testdate_iterator.cpp ../build//boost_date_time : : : $(DATE_TIME_DYNAMIC_PROPERTIES) : testdate_iterator_dll ]
--   [ run gregorian/testformatters.cpp ../build//boost_date_time : : : $(DATE_TIME_DYNAMIC_PROPERTIES) : testformatters_dll ]
--###  streaming 
--   [ run gregorian/testdate_facet_new.cpp ../build//boost_date_time : : : $(DATE_TIME_DYNAMIC_PROPERTIES) : testdate_facet_new_dll ]
--   [ run gregorian/testdate_input_facet.cpp ../build//boost_date_time : : : $(DATE_TIME_DYNAMIC_PROPERTIES) : testdate_input_facet_dll ]
--###
--   [ run gregorian/testgenerators.cpp ../build//boost_date_time : : : $(DATE_TIME_DYNAMIC_PROPERTIES) : testgenerators_dll ]
--   [ run gregorian/testgreg_cal.cpp ../build//boost_date_time : : : $(DATE_TIME_DYNAMIC_PROPERTIES) : testgreg_cal_dll ]
--   [ run gregorian/testgreg_day.cpp ../build//boost_date_time : : : $(DATE_TIME_DYNAMIC_PROPERTIES) : testgreg_day_dll ]     
--   [ run gregorian/testgreg_month.cpp ../build//boost_date_time : : : $(DATE_TIME_DYNAMIC_PROPERTIES) : testgreg_month_dll ]
--   [ run gregorian/testgreg_year.cpp ../build//boost_date_time : : : $(DATE_TIME_DYNAMIC_PROPERTIES) : testgreg_year_dll ]
--   [ run gregorian/testgreg_durations.cpp ../build//boost_date_time : : : $(DATE_TIME_DYNAMIC_PROPERTIES) : testgreg_durations_dll ]
--  ;
- 
-    test-suite date_time_posixtime
-      : 
-@@ -122,9 +103,7 @@ test-suite date_time_gregorian_dll
- 
-    test-suite date_time_pre_133_facet 
-     :
--   [ run gregorian/testfacet.cpp ../build//boost_date_time : : : $(DATE_TIME_DYNAMIC_PROPERTIES)  <define>USE_DATE_TIME_PRE_1_33_FACET_IO : testfacet_dll ]
-    # this next test is commented out because it crashes on VC6 (cause unknown):
--#  [ run gregorian/testparse_date.cpp ../build//boost_date_time : : : $(DATE_TIME_DYNAMIC_PROPERTIES)  <define>USE_DATE_TIME_PRE_1_33_FACET_IO : testparse_date_dll ]
-    [ run gregorian/testfacet.cpp ../build//boost_date_time/<link>static : : : $(DATE_TIME_PROPERTIES)  <define>USE_DATE_TIME_PRE_1_33_FACET_IO  ]
-    [ run gregorian/testparse_date.cpp ../build//boost_date_time/<link>static : : : $(DATE_TIME_PROPERTIES)  <define>USE_DATE_TIME_PRE_1_33_FACET_IO ]
- 
-@@ -223,11 +202,6 @@ if ! [ os.environ UBSAN_OPTIONS ]
-    ../../serialization/build//boost_serialization
-    : : : $(DATE_TIME_PROPERTIES)
-    : testgreg_serialize ]
-- [ run gregorian/testgreg_serialize.cpp
--   ../build//boost_date_time
--   ../../serialization/build//boost_serialization
--   : : : $(DATE_TIME_DYNAMIC_PROPERTIES)
--   : testgreg_serialize_dll ]
-  [ run posix_time/testtime_serialize.cpp
-    ../build//boost_date_time/<link>static
-    ../../serialization/build//boost_serialization
 diff --git a/libs/filesystem/test/Jamfile.v2 b/libs/filesystem/test/Jamfile.v2
-index d34efb1..c1f2712 100644
+index 8dccb9f..e617e84 100644
 --- a/libs/filesystem/test/Jamfile.v2
 +++ b/libs/filesystem/test/Jamfile.v2
-@@ -27,7 +27,6 @@ if [ os.environ UBSAN ]
+@@ -70,7 +70,6 @@ if [ os.environ UBSAN ]
          <library>/boost/filesystem//boost_filesystem/<visibility>global ;
  }
  
 -run config_info.cpp : : : <link>shared <test-info>always_show_run_output ;
  run config_info.cpp : : : <link>static <test-info>always_show_run_output : config_info_static ;
- run convenience_test.cpp ;
+ run convenience_test.cpp : : : <define>BOOST_FILESYSTEM_VERSION=4 ;
  compile macro_default_test.cpp ;
-@@ -36,12 +35,9 @@ run deprecated_test.cpp ;
- run fstream_test.cpp : : :  $(VIS) ;
- run large_file_support_test.cpp ;
- run locale_info.cpp : : : <test-info>always_show_run_output ;
--run operations_test.cpp : : : <link>shared <test-info>always_show_run_output ;
- run operations_test.cpp : : : <link>static : operations_test_static ;
--run operations_unit_test.cpp : $(HERE) : : <link>shared <test-info>always_show_run_output ;
--run path_test.cpp : : : <link>shared ;
-+run operations_unit_test.cpp : $(HERE) : : <link>static <test-info>always_show_run_output ;
- run path_test.cpp : : : <link>static : path_test_static ;
--run path_unit_test.cpp : : : <link>shared $(VIS) ;
- run path_unit_test.cpp : : : <link>static $(VIS) : path_unit_test_static ;
- run relative_test.cpp ;
- run ../example/simple_ls.cpp ;
+@@ -79,16 +78,11 @@ run deprecated_test.cpp : : : <define>BOOST_FILESYSTEM_VERSION=3 ;
+ run fstream_test.cpp : : : $(VIS) <define>BOOST_FILESYSTEM_VERSION=4 ;
+ run large_file_support_test.cpp : : : <define>BOOST_FILESYSTEM_VERSION=4 ;
+ run locale_info.cpp : : : <define>BOOST_FILESYSTEM_VERSION=4 <test-info>always_show_run_output ;
+-run operations_test.cpp : : : <link>shared <define>BOOST_FILESYSTEM_VERSION=4 <test-info>always_show_run_output ;
+ run operations_test.cpp : : : <link>static <define>BOOST_FILESYSTEM_VERSION=4 : operations_test_static ;
+-run operations_unit_test.cpp : $(HERE) : : <link>shared <define>BOOST_FILESYSTEM_VERSION=4 <test-info>always_show_run_output ;
++run operations_unit_test.cpp : $(HERE) : : <link>static <define>BOOST_FILESYSTEM_VERSION=4 <test-info>always_show_run_output ;
+ run copy_test.cpp : : : <define>BOOST_FILESYSTEM_VERSION=4 ;
+-run path_test.cpp : : : <link>shared <define>BOOST_FILESYSTEM_VERSION=4 ;
+ run path_test.cpp : : : <link>static <define>BOOST_FILESYSTEM_VERSION=4 : path_test_static ;
+-run path_test.cpp : : : <link>shared <define>BOOST_FILESYSTEM_VERSION=3 : path_test_v3 ;
+-run path_unit_test.cpp : : : <link>shared $(VIS) <define>BOOST_FILESYSTEM_VERSION=4 ;
+ run path_unit_test.cpp : : : <link>static $(VIS) <define>BOOST_FILESYSTEM_VERSION=4 : path_unit_test_static ;
+-run path_unit_test.cpp : : : <link>shared $(VIS) <define>BOOST_FILESYSTEM_VERSION=3 : path_unit_test_v3 ;
+ run relative_test.cpp : : : <define>BOOST_FILESYSTEM_VERSION=4 ;
+ run ../example/simple_ls.cpp : : : <define>BOOST_FILESYSTEM_VERSION=4 ;
+ run ../example/file_status.cpp : : : <define>BOOST_FILESYSTEM_VERSION=4 ;
 diff --git a/libs/program_options/test/Jamfile.v2 b/libs/program_options/test/Jamfile.v2
-index a45ed8e..6daddd5 100644
+index 0f1a6e7..617c8c9 100644
 --- a/libs/program_options/test/Jamfile.v2
 +++ b/libs/program_options/test/Jamfile.v2
 @@ -4,7 +4,7 @@ project
@@ -107,10 +64,10 @@ index a45ed8e..6daddd5 100644
  }    
  
 diff --git a/libs/regex/test/Jamfile.v2 b/libs/regex/test/Jamfile.v2
-index 17f6b84..dd4b56a 100644
+index 87bc160..2885ba8 100644
 --- a/libs/regex/test/Jamfile.v2
 +++ b/libs/regex/test/Jamfile.v2
-@@ -139,19 +139,13 @@ test-suite regex
+@@ -138,12 +138,6 @@ test-suite regex
           : # input files
           : <test-info>always_show_run_output
        ]
@@ -123,15 +80,7 @@ index 17f6b84..dd4b56a 100644
  
        [ run collate_info/collate_info.cpp ../build//boost_regex
        : : : <test-info>always_show_run_output : test_collate_info ]
- 
- 
-       [ link concepts/concept_check.cpp ../build//boost_regex ]
--      [ link concepts/icu_concept_check.cpp ../build//boost_regex ]
-+#TODO [ link concepts/icu_concept_check.cpp ../build//boost_regex ]
-       [ link concepts/range_concept_check.cpp ../build//boost_regex ]
-       [ run concepts/test_bug_11988.cpp ../build//boost_regex ]
-       
-@@ -185,7 +179,7 @@ test-suite regex
+@@ -200,7 +194,7 @@ test-suite regex
      <define>BOOST_NO_EXCEPTIONS=1
      <exception-handling>off
      <link>static
@@ -141,48 +90,27 @@ index 17f6b84..dd4b56a 100644
  
  ;
 diff --git a/libs/system/test/Jamfile.v2 b/libs/system/test/Jamfile.v2
-index 8b6ee0a..9ec6e4e 100644
+index 0a6bc3e..ff60879 100644
 --- a/libs/system/test/Jamfile.v2
 +++ b/libs/system/test/Jamfile.v2
-@@ -16,8 +16,6 @@ project
-       <library>/boost/system//boost_system
-     ;
+@@ -28,7 +28,6 @@ rule system-run ( sources + )
  
--   lib throw_test : throw_test.cpp : <link>shared:<define>THROW_DYN_LINK=1 ;
--
-    lib single_instance_lib1 : single_instance_1.cpp : <link>shared:<define>SINGLE_INSTANCE_DYN_LINK ;
-    lib single_instance_lib2 : single_instance_2.cpp : <link>shared:<define>SINGLE_INSTANCE_DYN_LINK ;
+     result += [ run $(sources) ] ;
+     result += [ run $(sources) : : : <library>/boost/system//boost_system <link>static : $(sources[1]:B)_static ] ;
+-    result += [ run $(sources) : : : <library>/boost/system//boost_system <link>shared : $(sources[1]:B)_shared ] ;
+     result += [ run $(sources) : : : <define>BOOST_NO_ANSI_APIS : $(sources[1]:B)_no_ansi ] ;
+     result += [ run $(sources) : : : <define>BOOST_SYSTEM_USE_UTF8 : $(sources[1]:B)_utf8 ] ;
  
-@@ -66,7 +64,6 @@ project
-       local result ;
+@@ -41,7 +40,7 @@ system-run system_error_test.cpp ;
  
-       result += [ run $(sources) : : : <link>static : $(sources[1]:B)_static ] ;
--      result += [ run $(sources) : : : <link>shared : $(sources[1]:B)_shared ] ;
-       result += [ run $(sources) : : : -<library>/boost/system//boost_system <define>BOOST_ERROR_CODE_HEADER_ONLY : $(sources[1]:B)_header ] ;
+ lib throw_test : throw_test.cpp : <link>shared:<define>THROW_DYN_LINK=1 ;
  
-       return $(result) ;
-@@ -88,11 +85,9 @@ else
+-run dynamic_link_test.cpp throw_test : : : <link>shared : throw_test_shared ;
++run dynamic_link_test.cpp throw_test : : : <link>static : throw_test_shared ;
  
-       # Test a source file built with -std=c++03 linked with a System library built without -std=c++03
-       result += [ run $(sources) : : : <link>static <conditional>@cxx03 : $(sources[1]:B)_static_03 ] ;
--      result += [ run $(sources) : : : <link>shared <conditional>@cxx03 : $(sources[1]:B)_shared_03 ] ;
- 
-       # Test a source file built with -std=c++11 linked with a System library built without -std=c++11
-       result += [ run $(sources) : : : <link>static <conditional>@cxx11 : $(sources[1]:B)_static_11 ] ;
--      result += [ run $(sources) : : : <link>shared <conditional>@cxx11 : $(sources[1]:B)_shared_11 ] ;
- 
-       return $(result) ;
-    }
-@@ -102,8 +97,6 @@ system-run error_code_test.cpp ;
- system-run error_code_user_test.cpp ;
- system-run system_error_test.cpp ;
- 
--run dynamic_link_test.cpp throw_test :  :  : <link>shared : throw_test_shared ;
--
  system-run initialization_test.cpp ;
- 
- run header_only_test.cpp : : : -<library>/boost/system//boost_system ;
-@@ -116,7 +109,6 @@ system-run std_mismatch_test.cpp ;
+ system-run header_only_test.cpp ;
+@@ -56,7 +55,6 @@ lib single_instance_lib2 : single_instance_2.cpp : <link>shared:<define>SINGLE_I
  
  system-run single_instance_test.cpp single_instance_1.cpp single_instance_2.cpp ;
  run single_instance_test.cpp single_instance_lib1 single_instance_lib2 : : : <link>static : single_instance_lib_static ;
@@ -190,3 +118,11 @@ index 8b6ee0a..9ec6e4e 100644
  
  system-run before_main_test.cpp ;
  run-fail throws_assign_fail.cpp ;
+@@ -84,7 +82,6 @@ lib std_single_instance_lib2 : std_single_instance_2.cpp : <link>shared:<define>
+ 
+ system-run std_single_instance_test.cpp std_single_instance_1.cpp std_single_instance_2.cpp ;
+ run std_single_instance_test.cpp std_single_instance_lib1 std_single_instance_lib2 : : : <link>static : std_single_instance_lib_static ;
+-run std_single_instance_test.cpp std_single_instance_lib1 std_single_instance_lib2 : : : <link>shared <define>STD_SINGLE_INSTANCE_SHARED : std_single_instance_lib_shared ;
+ 
+ run is_error_code_enum_test.cpp ;
+ run is_error_condition_enum_test.cpp ;
