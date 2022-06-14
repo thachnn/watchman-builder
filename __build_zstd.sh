@@ -15,7 +15,8 @@ then
   tar -xf "$_PKG.tar.gz"
 
   cd "$_PKG/lib"
-  make -j2 V=1 install-static-mt install-includes install-pc "PREFIX=$_PREFIX"
+  sed -i- 's/install-static:$/& libzstd.a/' Makefile
+  make -j2 V=1 install-static-mt install-includes install-pc "PREFIX=$_PREFIX" BUILD_DIR=obj
 
   # Correct .pc file
   sed -i '' -e "s:=$_PREFIX:=\${prefix}:;s:^prefix=\\\$.*:prefix=$_PREFIX:" \
@@ -24,8 +25,10 @@ then
   if [[ "$_NO_TESTS" == 0 ]]; then
     cd ../tests
     for i in common=m compress=c decompress=d legacy=l; do
-      for f in "../lib/${i%=*}"/*.o; do
-        for k in mt_ ''; do ln -s "$f" "./zstd$k${i#*=}_$(basename "$f")"; done
+      for j in "../lib/${i%=*}"/*.c; do
+        f="$(basename "${j%.c}.o")"
+        [[ ! -e "../lib/obj/static/$f" ]] || \
+          for k in mt_ ''; do ln -s "../lib/obj/static/$f" "./zstd$k${i#*=}_$f"; done
       done
     done
 
