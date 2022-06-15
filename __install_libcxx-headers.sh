@@ -2,11 +2,23 @@
 set -xe
 
 : "${_PREFIX:=$1}"
+: "${_SCRATCH_DIR:=$2}"
 
 # Check missing C++17 headers
 _TMPCXX_="$(mktemp -ut cxx17test).cxx"
 echo '#include <variant>
-int main() { std::variant<float, int> v(0); return 0; }' > "$_TMPCXX_"
+#include <optional>
+
+int main() {
+  std::variant<float, int> v(0);
+  std::optional<int> o(0);
+
+  long n;
+  unsigned long *addr;
+  int b;
+  asm volatile("bt %2,%1" : "=@ccc" (b) : "m" (*addr), "Ir" (n));
+  return b;
+}' > "$_TMPCXX_"
 
 _TMPCXX_="-D_GNU_SOURCE -std=gnu++1z -I$_PREFIX/include -o $_TMPCXX_.o -c $_TMPCXX_"
 [[ -z "$SDKROOT" ]] || _TMPCXX_="-isysroot $SDKROOT $_TMPCXX_"
@@ -15,30 +27,28 @@ _TMPCXX_="-D_GNU_SOURCE -std=gnu++1z -I$_PREFIX/include -o $_TMPCXX_.o -c $_TMPC
 
 if ! ${CXX:-clang++} $_TMPCXX_ &> /dev/null
 then
-  mkdir -p "$_PREFIX/include"
-  # C++17 std::variant patching...
-  curl -kfSL https://github.com/apple/swift-libcxx/raw/swift-5.0-RELEASE/include/variant \
-    | sed -e 's/^\(#include <__undef\)_macros>/\1_min_max>/' \
-      -e '/^_LIBCPP_P[H-U]*_MACROS$/d;s/_LIBCPP_INLINE_VAR /inline /' \
-      -e 's/is_invocable_v<\([^ ,]*\), \([^>]*\)>/is_callable_v<\1(\2)>/' \
-      -e 's/__enable_hash_helper<\([^ ,]*\), .*>> /\1> /' \
-      -e '/^ *enable_if_t<!__is_inplace_index<.*> = 0,$/d' \
-    > "$_PREFIX/include/variant"
+  if [[ ! -x "$_PREFIX/llvm/bin/clang" ]]
+  then
+  (
+    _SC_DIR="$(cd "`dirname "$0"`"; pwd)"
+    _VER="$( "$_SC_DIR/get_clang_ver.sh" || echo '9.0.0' )"
+    _PKG="clang+llvm-$_VER-x86_64"
 
-  ${CXX:-clang++} $_TMPCXX_ > /dev/null
-fi
+    cd "$_SCRATCH_DIR"
+    [ -s "$_PKG"-*.tar.xz ] || \
+      "$_SC_DIR/download_llvm_pkg.sh" "$_PKG-apple-darwin" "$_VER" || \
+      "$_SC_DIR/download_llvm_pkg.sh" "$_PKG-darwin-apple" "$_VER"
 
-# C++17 std::optional patching...
-echo '#include <optional>
-int main() { std::optional<int> v(0); return 0; }' > "${_TMPCXX_#* -c }"
+    (set +x; while sleep 2; do echo -n .; done) & \
+      tar -C "$_PREFIX" -xf "$_PKG"-*.tar.xz && kill -9 $!
+    mv -f "$_PREFIX/$_PKG"-* "$_PREFIX/llvm"
 
-if ! ${CXX:-clang++} $_TMPCXX_ &> /dev/null
-then
-  mkdir -p "$_PREFIX/include"
-  echo '#pragma once
-#include <experimental/optional>
-namespace std { using namespace experimental; }' > "$_PREFIX/include/optional"
+    sed -i- 's/(\(macosx,strict,introduced\)=1[0-3][0-9.]*)/(\1=10.9)/' \
+      "$_PREFIX/llvm/include/c++/v1/__config"
+  )
+  fi
 
+  export PATH="$_PREFIX/llvm/bin:$PATH"
   ${CXX:-clang++} $_TMPCXX_ > /dev/null
 fi
 
