@@ -43,7 +43,7 @@ then
       tar -C "$_PREFIX" -xf "$_PKG"-*.tar.xz && kill -9 $!
     mv -f "$_PREFIX/$_PKG"-* "$_PREFIX/llvm"
 
-    sed -i- 's/(\(macosx,strict,introduced\)=1[0-3][0-9.]*)/(\1=10.9)/' \
+    sed -i- 's/\(macos[^ =]*,introduced\)=1[0-3][0-9.]*/\1=10.9/' \
       "$_PREFIX/llvm/include/c++/v1/__config"
   )
   fi
