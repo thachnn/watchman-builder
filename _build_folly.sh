@@ -22,12 +22,19 @@ then
   cd "$_PKG"
   # Patching...
   patch -p1 -i "$_SC_DIR/folly.patch"
+  sed -i- 's/\${Boost_LIBRARIES}/& icudata icui18n icuuc/' CMake/folly-deps.cmake
   sed -i- 's/:\${CMAKE_BINARY_DIR}//' CMakeLists.txt
+
+  # test_support
+  _cxxlib="$(which ${CXX:-clang++} | sed 's|^\(.*\)/.*/.*|\1/lib|')"
+  [[ ! -e "$_cxxlib/libc++.dylib" || "$_NO_TESTS" != 0 ]] || \
+    sed -i '' "s|^ *\\\${GLOG_LIBRARY}|& -L$_cxxlib -Wl,-rpath,$_cxxlib|" CMakeLists.txt
 
   cmake . -DCMAKE_BUILD_TYPE=Release -DCMAKE_FIND_FRAMEWORK=LAST \
     -DCMAKE_VERBOSE_MAKEFILE=ON -Wno-dev "-DCMAKE_INSTALL_PREFIX=$_PREFIX" \
-    "-DCMAKE_PREFIX_PATH=$_PREFIX" -DFOLLY_CXX_FLAGS=-Wno-unusable-partial-specialization \
-    -DBUILD_SHARED_LIBS=OFF -DBUILD_TESTS=$([[ "$_NO_TESTS" == 0 ]] && echo ON || echo OFF)
+    "-DCMAKE_PREFIX_PATH=$_PREFIX" "-DFOLLY_SHINY_DEPENDENCIES=-L$_PREFIX/lib" \
+    -DBUILD_SHARED_LIBS=OFF -DFOLLY_CXX_FLAGS=-Wno-unusable-partial-specialization \
+    -DBOOST_LINK_STATIC=ON -DBUILD_TESTS=$([[ "$_NO_TESTS" == 0 ]] && echo ON || echo OFF)
   # -DFOLLY_USE_JEMALLOC=OFF
 
   # Use relative paths

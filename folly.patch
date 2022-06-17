@@ -53,6 +53,18 @@ index ffa043c..039a102 100644
  libdir=${exec_prefix}/@CMAKE_INSTALL_LIBDIR@
  includedir=${prefix}/@CMAKE_INSTALL_INCLUDEDIR@
  
+diff --git a/folly/CMakeLists.txt b/folly/CMakeLists.txt
+index 883f27c..2d2086f 100644
+--- a/folly/CMakeLists.txt
++++ b/folly/CMakeLists.txt
+@@ -28,7 +28,6 @@ install(
+ )
+ 
+ add_subdirectory(experimental/exception_tracer)
+-add_subdirectory(logging/example)
+ 
+ if (PYTHON_EXTENSIONS)
+   # Create tree of symbolic links in structure required for successful
 diff --git a/folly/io/async/test/EventBaseTestLib.h b/folly/io/async/test/EventBaseTestLib.h
 index da24844..4b99f60 100644
 --- a/folly/io/async/test/EventBaseTestLib.h
@@ -79,18 +91,3 @@ index f2f3c0a..c26d3ec 100644
    auto a = folly::to_shared_ptr_aliasing(sp, &std::get<1>(*sp));
    EXPECT_EQ(4, *a);
  }
-diff --git a/folly/test/TraitsTest.cpp b/folly/test/TraitsTest.cpp
-index fd6e6d6..f435677 100644
---- a/folly/test/TraitsTest.cpp
-+++ b/folly/test/TraitsTest.cpp
-@@ -109,8 +109,10 @@ TEST(Traits, conditional) {
- 
-   EXPECT_TRUE(Cond<false>::fun_std("hello"));
-   EXPECT_TRUE(Cond<true>::fun_std("hello"));
-+#if __cplusplus >= 201703L
-   EXPECT_TRUE(Cond<false>::fun_folly("hello"));
-   EXPECT_FALSE(Cond<true>::fun_folly("hello"));
-+#endif
- }
- 
- TEST(Trait, logicOperators) {

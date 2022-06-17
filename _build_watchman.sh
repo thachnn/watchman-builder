@@ -18,9 +18,14 @@ cd "$_PKG"
 # Add `testing` option
 patch -p1 -i "$_SC_DIR/watchman.patch"
 
+_cxxlib="$(which ${CXX:-clang++} | sed 's|^\(.*\)/.*/.*|\1/lib|')"
+[[ ! -e "$_cxxlib/libc++.dylib" || "$_NO_TESTS" != 0 ]] || \
+  sed -i- "s|\(_libraries *(testsupport .*\))\$|\\1 -L$_cxxlib -Wl,-rpath,$_cxxlib)|" CMakeLists.txt
+
 cmake . -DCMAKE_BUILD_TYPE=Release -DCMAKE_FIND_FRAMEWORK=LAST \
-  -DCMAKE_VERBOSE_MAKEFILE=ON -Wno-dev -DBUILD_TESTING=OFF "-DCMAKE_INSTALL_PREFIX=$_PREFIX" \
-  "-DCMAKE_PREFIX_PATH=$_PREFIX" -DCMAKE_BUILD_WITH_INSTALL_RPATH=OFF $_EXTRA_ARGS \
+  -DCMAKE_VERBOSE_MAKEFILE=ON -Wno-dev "-DCMAKE_INSTALL_PREFIX=$_PREFIX" \
+  "-DCMAKE_PREFIX_PATH=$_PREFIX" -DBUILD_TESTING=OFF $_EXTRA_ARGS \
+  -DCMAKE_CXX_FLAGS=-fno-aligned-allocation -DCMAKE_BUILD_WITH_INSTALL_RPATH=OFF \
   "-DWATCHMAN_VERSION_OVERRIDE=${_PKG#*-}" "-DWATCHMAN_BUILDINFO_OVERRIDE=$USER"
 
 # Use relative paths
