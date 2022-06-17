@@ -31,14 +31,16 @@ cd /usr/local && zip -ru ~/watchman-2022.05.16-macos.zip var/run/watchman*
 
 ## Note
 
-- To run Watchman unit-tests on old macOS (<= 10.12), just build as normally, then install
-  LLVM `libc++*.dylib` into target libdir (e.g. `/opt/local/lib`) and re-build with `--unit-test` option
+- To run Folly/Watchman unit-tests on old macOS (<= 10.12), just install modern Clang/LLVM,
+  then use it to re-build with `--unit-test` option
 ```bash
-curl -OkfSL https://releases.llvm.org/9.0.0/clang+llvm-9.0.0-x86_64-darwin-apple.tar.xz
+curl -OkfSL https://github.com/llvm/llvm-project/releases/download/llvmorg-9.0.1/clang+llvm-9.0.1-x86_64-apple-darwin.tar.xz
+tar -C /usr/local/opt -xf clang+llvm-*-x86_64-*.tar.xz
 
-tar -C /opt/local -xvf clang+llvm-9.0.0-x86_64-darwin-apple.tar.xz --strip-components=1 \
-  clang+llvm-9.0.0-x86_64-darwin-apple/lib/{libc++abi.1.0,libc++abi.1,libc++abi,libc++.1.0,libc++.1,libc++}.dylib
+mv /usr/local/opt/clang+llvm-*-x86_64-* /usr/local/opt/llvm
+sed -i- 's/\(macos[^ =]*,introduced\)=1[0-3][0-9.]*/\1=10.9/' /usr/local/opt/llvm/include/c++/v1/__config
 
+export PATH="/usr/local/opt/llvm/bin:${PATH}"
 ./build.sh --prefix=/opt/local --scratch-path=/usr/local/src \
   --without-python --state-dir=/usr/local/var/run/watchman --with-os-libs --unit-test
 ```
