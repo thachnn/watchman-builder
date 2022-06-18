@@ -8,6 +8,8 @@ _SCRATCH_DIR="$2"
 _EXTRA_ARGS="$3"
 _NO_TESTS="$4"
 
+. "$_SC_DIR/__install_rust-lang.sh"
+
 cd "$_SCRATCH_DIR"
 [[ -s "$_PKG.tgz" ]] || \
   curl -o "$_PKG.tgz" -kfSL "https://github.com/facebook/watchman/archive/v${_PKG#*-}.tar.gz"

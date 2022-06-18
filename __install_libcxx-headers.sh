@@ -31,17 +31,15 @@ then
   then
   (
     _SC_DIR="$(cd "`dirname "$0"`"; pwd)"
-    _VER="$( "$_SC_DIR/get_clang_ver.sh" || echo '9.0.0' )"
-    _PKG="clang+llvm-$_VER-x86_64"
+    _VER="$( "$_SC_DIR/get_clang_ver.sh" | sed 's/^9\.0\.0/9.0.1/' )"
+    _PKG="clang+llvm-${_VER:=9.0.1}-x86_64-apple-darwin"
 
     cd "$_SCRATCH_DIR"
-    [ -s "$_PKG"-*.tar.xz ] || \
-      "$_SC_DIR/download_llvm_pkg.sh" "$_PKG-apple-darwin" "$_VER" || \
-      "$_SC_DIR/download_llvm_pkg.sh" "$_PKG-darwin-apple" "$_VER"
+    [[ -s "$_PKG.tar.xz" ]] || "$_SC_DIR/download_llvm_pkg.sh" "$_PKG" "$_VER"
 
     (set +x; while sleep 2; do echo -n .; done) & \
-      tar -C "$_PREFIX" -xf "$_PKG"-*.tar.xz && kill -9 $!
-    mv -f "$_PREFIX/$_PKG"-* "$_PREFIX/llvm"
+      tar -C "$_PREFIX" -xf "$_PKG.tar.xz" && kill -9 $!
+    mv -f "$_PREFIX/$_PKG" "$_PREFIX/llvm"
 
     sed -i- 's/\(macos[^ =]*,introduced\)=1[0-3][0-9.]*/\1=10.9/' \
       "$_PREFIX/llvm/include/c++/v1/__config"
