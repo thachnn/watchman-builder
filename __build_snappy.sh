@@ -19,7 +19,7 @@ then
   # Patch tests
   sed -i- -e 's|"" HAVE_LIBLZ|"${CMAKE_PREFIX_PATH}/lib" HAVE_LIBLZ|' \
     -e 's|^ *"\${PROJECT_SOURCE_DIR}"|& "${CMAKE_PREFIX_PATH}/include"|' \
-    -e 's|include\(_directories *(snappy_test_support\)|target_link\1 PUBLIC "${CMAKE_PREFIX_PATH}/lib")\
+    -e 's|.*include\(_directories *(snappy_test_support\)|target_link\1 PUBLIC "${CMAKE_PREFIX_PATH}/lib")\
 &|;/^ *add_subdirectory.*third_party\/googletest/d;s/ gmock_main gtest/ gmock&/' \
     -e 's/(SNAPPY_HAVE_NO_MISSING_FIELD_INITIALIZERS)/(FALSE)/' CMakeLists.txt
 
