@@ -20,6 +20,11 @@ cd "$_PKG"
 # Add `testing` option
 patch -p1 -i "$_SC_DIR/watchman.patch"
 
+# Update Cargo indexes
+_dir="$(cargo search _; ls -1t "$HOME/.cargo/registry/index" | head -1)"
+sed -i- -e "s|\(/registry/src/\)=|\\1$_dir/=|" -e 's/(cargo_flags build /&--verbose /' \
+  build/fbcode_builder/CMake/RustStaticLibrary.cmake
+
 _cxxlib="$(which ${CXX:-clang++} | sed 's|^\(.*\)/.*/.*|\1/lib|')"
 [[ ! -e "$_cxxlib/libc++.dylib" || "$_NO_TESTS" != 0 ]] || \
   sed -i- "s|\(_libraries *(testsupport .*\))\$|\\1 -L$_cxxlib -Wl,-rpath,$_cxxlib)|" CMakeLists.txt

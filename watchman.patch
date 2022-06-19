@@ -141,3 +141,46 @@ index c26ce78..dacc0b1 100644
  
 -set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall -Wextra -Wno-deprecated -Wno-deprecated-declarations")
 +set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wno-deprecated -Wno-deprecated-declarations")
+diff --git a/build/fbcode_builder/CMake/RustStaticLibrary.cmake b/build/fbcode_builder/CMake/RustStaticLibrary.cmake
+index d35f208..52df2e3 100644
+--- a/build/fbcode_builder/CMake/RustStaticLibrary.cmake
++++ b/build/fbcode_builder/CMake/RustStaticLibrary.cmake
+@@ -15,6 +15,7 @@ set(
+ set_property(CACHE GENERATE_CARGO_VENDOR_CONFIG PROPERTY STRINGS AUTO ON OFF)
+ 
+ set(RUST_VENDORED_CRATES_DIR "$ENV{RUST_VENDORED_CRATES_DIR}")
++set(RUST_CARGO_HOME "$ENV{HOME}/.cargo")
+ 
+ if("${USE_CARGO_VENDOR}" STREQUAL "AUTO")
+   if(EXISTS "${RUST_VENDORED_CRATES_DIR}")
+@@ -130,6 +131,7 @@ function(rust_static_library TARGET)
+     COMMAND
+       "${CMAKE_COMMAND}" -E env
+       "CARGO_TARGET_DIR=${CMAKE_CURRENT_BINARY_DIR}"
++      "RUSTFLAGS=--remap-path-prefix ${RUST_CARGO_HOME}/registry/src/= --remap-path-prefix ${CMAKE_SOURCE_DIR}/watchman/="
+       ${extra_cargo_env}
+       ${cargo_cmd}
+       ${cargo_flags}
+@@ -196,6 +198,7 @@ function(rust_executable TARGET)
+     COMMAND
+       "${CMAKE_COMMAND}" -E env
+       "CARGO_TARGET_DIR=${CMAKE_CURRENT_BINARY_DIR}"
++      "RUSTFLAGS=--remap-path-prefix ${RUST_CARGO_HOME}/registry/src/= --remap-path-prefix ${CMAKE_SOURCE_DIR}/watchman/="
+       ${extra_cargo_env}
+       ${cargo_cmd}
+       ${cargo_flags}
+diff --git a/watchman/cli/Cargo.toml b/watchman/cli/Cargo.toml
+index 158ee2d..4678d8e 100644
+--- a/watchman/cli/Cargo.toml
++++ b/watchman/cli/Cargo.toml
+@@ -3,6 +3,10 @@ name = "watchmanctl"
+ version = "0.1.0"
+ edition = "2021"
+ 
++[profile.release.build-override]
++opt-level = 3
++debug = false
++
+ [dependencies]
+ anyhow = "1.0"
+ structopt = "0.3"
