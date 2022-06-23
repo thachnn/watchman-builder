@@ -4,33 +4,40 @@ _SC_DIR="$(dirname "$0")"
 
 _PREFIX="${1:-/usr/local}"
 _SCRATCH_DIR="${2:-$(cd "$_SC_DIR/.."; pwd)}"
-_PKG="rust-${3:-1.59.0}"
-_TRIPLE=x86_64-apple-darwin
+_PKG="rustc-${3:-1.59.0}-src"
 
-if [[ ! -e "$_PREFIX/rust/lib/rustlib/$_TRIPLE/lib" ]]
+if [[ ! -x "$_PREFIX/bin/rustc" ]] && command -v python3 &> /dev/null
 then
+  [[ ":$PATH:" == *:"$_PREFIX/bin":* ]] || export PATH="$_PREFIX/bin:$PATH"
   . "$_SC_DIR/_install_cmake.sh"
 
   cd "$_SCRATCH_DIR"
+  [[ -s "$_PKG.tar.xz" ]] || curl -OkfSL "https://static.rust-lang.org/dist/$_PKG.tar.xz"
   rm -rf "$_PKG"
-  git clone --depth=1 -b "${_PKG#*-}" https://github.com/rust-lang/rust.git "$_PKG"
+  (set +x; while sleep 2; do echo -n .; done) & tar -xf "$_PKG.tar.xz" && kill -9 $!
 
   cd "$_PKG"
-  git rm -r $(grep -e $'^[ \t]*path *= *src/doc/' .gitmodules | sed 's/^.*path *= *//')
-  git submodule update --init --depth=1 # --recursive
+  # Patches
+  (
+    cd vendor/openssl-src
+    _f=openssl/crypto/rand/rand_unix.c; _s="$(shasum -a256 $_f | cut -d' ' -f1)"
+    sed -i '' $'s|^\(# *include <CommonCrypto/Common\)Random.h>|\\1CryptoError.h>\\\n&|' $_f
+    sed -i '' "s/$_s/$(shasum -a256 $_f | cut -d' ' -f1)/" .cargo-checksum.json
+  )
 
-  # ./configure --release-channel=stable
-  sed -e 's|^[# ]*\(configure-args\) *=.*|\1 = ["--release-channel=stable"]|' \
-    -e 's/^[# ]*channel *=.*/channel = "stable"/;s/^[# ]*ninja *=.*/ninja = false/' \
-    -e "s/^ *\[target\..*-unknown-.*\]/[target.$_TRIPLE]/" config.toml.example > config.toml
+  ./configure "--prefix=$_PREFIX" --release-channel=stable --enable-vendor \
+    --disable-docs --python=python3 --disable-manage-submodules --enable-locked-deps \
+    --enable-cargo-native-static --set rust.codegen-units-std=1 --enable-parallel-compiler \
+    --disable-dist-src --dist-compression-formats=xz --enable-extended --tools=cargo \
+    --enable-profiler $(command -v ninja &> /dev/null || echo '--disable-ninja') \
+    $(command -v rustc &> /dev/null && echo '--enable-local-rust' || true)
+  # --enable-llvm-static-stdcpp --set llvm.download-ci-llvm
 
-  # Hash of crates.io source
-  _dir="$((ls -1t "$HOME/.cargo/registry/index" || echo github.com-1ecc6299db9ec823) | head -1)"
-  RUSTFLAGS="--remap-path-prefix $HOME/.cargo/registry/src/$_dir/= --remap-path-prefix $PWD/=" \
-  ./x.py build --stage 0 library/std
+  CARGO_HOME="$PWD/.cargo" \
+  RUSTFLAGS="$(echo "--remap-path-prefix $PWD"/{vendor,compiler,src,library}/=)" \
+  python3 x.py dist -v -j 2 rust-std rustc cargo
 
   # Install files
-  mkdir -p "$_PREFIX/rust/lib/rustlib"
-  cp -af "build/$_TRIPLE/stage0-sysroot/lib/rustlib/$_TRIPLE" "$_PREFIX/rust/lib/rustlib"
-  ln -sf ../../../librustc-stable_rt.{a,l,t}san.dylib "$_PREFIX/rust/lib/rustlib/$_TRIPLE/lib"
+  find build/dist -name '*.xz' \
+    -exec tar -C "$_PREFIX" --strip-components=2 --exclude=manifest.in -xf "{}" \;
 fi
