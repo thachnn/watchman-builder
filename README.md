@@ -36,3 +36,12 @@ cd /usr/local && zip -ru ~/watchman-2022.05.16-macos.zip var/run/watchman*
 ./build.sh --prefix=/opt/local --scratch-path=/usr/local/src \
   --without-python --state-dir=/usr/local/var/run/watchman --with-os-libs --unit-test
 ```
+
+- To optimize `watchmanctl`, just install the optimized `Rust` compiler first, then use it for building
+```bash
+# sudo chmod g+w /usr/local/{bin,lib,libexec,include,etc,share,var}
+./build_rust-std.sh /usr/local /usr/local/src
+
+./build.sh --prefix=/opt/local --scratch-path=/usr/local/src \
+  --without-python --state-dir=/usr/local/var/run/watchman --with-os-libs
+```

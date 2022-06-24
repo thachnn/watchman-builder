@@ -27,10 +27,10 @@ then
   [[ ! -e "$_cxxlib/libc++.dylib" || "$_NO_TESTS" != 0 ]] || \
     sed -i '' "s|^ *\\\${GLOG_LIBRARY}|& -L$_cxxlib -Wl,-rpath,$_cxxlib|" CMakeLists.txt
 
-  cmake . -DCMAKE_BUILD_TYPE=Release -DCMAKE_FIND_FRAMEWORK=LAST \
-    -DCMAKE_VERBOSE_MAKEFILE=ON -Wno-dev "-DCMAKE_INSTALL_PREFIX=$_PREFIX" \
+  cmake . -DCMAKE_BUILD_TYPE=Release -DCMAKE_FIND_FRAMEWORK=LAST -DCMAKE_VERBOSE_MAKEFILE=ON \
+    -Wno-dev "-DCMAKE_INSTALL_PREFIX=$_PREFIX" -DBUILD_SHARED_LIBS=OFF \
     "-DCMAKE_PREFIX_PATH=$_PREFIX" "-DFOLLY_SHINY_DEPENDENCIES=-L$_PREFIX/lib" \
-    -DBUILD_SHARED_LIBS=OFF -DFOLLY_CXX_FLAGS=-Wno-unusable-partial-specialization \
+    '-DFOLLY_CXX_FLAGS=-Wno-unusable-partial-specialization;-Wno-undef-prefix' \
     -DBOOST_LINK_STATIC=ON -DBUILD_TESTS=$([[ "$_NO_TESTS" == 0 ]] && echo ON || echo OFF)
   # -DFOLLY_USE_JEMALLOC=OFF
 
